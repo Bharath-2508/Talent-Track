@@ -28,7 +28,7 @@ export default function AiDetection() {
   }, [])
 
   return (
-    <Layout nav={PLAYER_NAV} title="AI Sport Detection" crumb="Upload Video / Analysis" portal="player" notifCount={2}>
+    <Layout nav={PLAYER_NAV} title="AI Running Analysis" crumb="Upload Video / Analysis" portal="player" notifCount={2}>
       <div className="grid grid-2">
         <Card pad>
           <SectionTitle>AI Video Analysis</SectionTitle>
@@ -43,15 +43,15 @@ export default function AiDetection() {
                       <Cpu />
                     </div>
                     <div style={{ fontWeight: 800, fontFamily: 'var(--font-display)' }}>AI Analysis in Progress…</div>
-                    <div className="tiny dim mt-1">Detecting sport · Analyzing pose · Scoring metrics</div>
+                    <div className="tiny dim mt-1">Analyzing pose · Scoring running metrics</div>
                   </div>
                 </div>
               </>
             ) : (
               <>
                 <img
-                  src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=1200&q=60"
-                  alt="cricket action"
+                  src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=1200&q=60"
+                  alt="running form analysis"
                   style={{ height: 420, objectFit: 'cover', width: '100%' }}
                 />
                 <div className="scan-chip">
@@ -64,8 +64,8 @@ export default function AiDetection() {
                   }}
                 >
                   <span className="pill" style={{ background: 'rgba(8,12,20,0.85)' }}>Overall: 87</span>
-                  <span className="pill" style={{ background: 'rgba(8,12,20,0.85)' }}>Bowling: 90</span>
-                  <span className="pill" style={{ background: 'rgba(8,12,20,0.85)' }}>Balance: 86</span>
+                  <span className="pill" style={{ background: 'rgba(8,12,20,0.85)' }}>Posture: 88</span>
+                  <span className="pill" style={{ background: 'rgba(8,12,20,0.85)' }}>Symmetry: 85</span>
                 </div>
               </>
             )}
@@ -74,7 +74,7 @@ export default function AiDetection() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Card glow pad>
-            <SectionTitle>Sport Detected</SectionTitle>
+            <SectionTitle>Running / Sprinting Analysis</SectionTitle>
             {stage === 'detected' ? (
               <div className="mt-3 center">
                 <div style={{ fontSize: 64 }}>{meta.icon}</div>
@@ -88,7 +88,7 @@ export default function AiDetection() {
                 <div className="ai-insight mt-3">
                   <Cpu />
                   <span>
-                    <b>{meta.label} Performance Analysis Ready.</b> All analysis, training and recommendations will be based only on the detected sport — {meta.label.toLowerCase()}.
+                    <b>{meta.label} Performance Analysis Ready.</b> All analysis, training and recommendations are based only on running / sprinting — {meta.label.toLowerCase()}.
                   </span>
                 </div>
                 <Link to="/player/report" className="btn btn-primary btn-lg btn-block mt-3">
@@ -97,7 +97,7 @@ export default function AiDetection() {
               </div>
             ) : (
               <div className="mt-3" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                {['Extracting frames…', 'Detecting sport from action…', 'Running pose estimation…', 'Scoring performance metrics…'].map((s, i) => (
+                {['Extracting frames…', 'Locking Running / Sprinting analysis…', 'Running pose estimation…', 'Scoring performance metrics…'].map((s, i) => (
                   <div key={s} className="flex gap-2">
                     <div className="bar" style={{ width: 26, flexShrink: 0, alignSelf: 'center' }}>
                       <div className="bar-fill" style={{ width: `${(conf / 96) * 100}%`, animation: 'none' }} />
@@ -115,9 +115,9 @@ export default function AiDetection() {
             <div className="flex gap-2">
               <CheckCircle2 size={20} color="#34d399" />
               <div>
-                <div style={{ fontWeight: 700, fontSize: 14 }}>Sport-locked analysis</div>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>Sprint-locked analysis</div>
                 <div className="tiny dim mt-1">
-                  Every metric, video and opportunity in your account now targets {meta.label}. Unrelated sports are automatically hidden.
+                  Every metric, video and opportunity in your account now targets {meta.label}. Only running / sprinting content is shown.
                 </div>
               </div>
             </div>

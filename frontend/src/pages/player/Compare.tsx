@@ -9,9 +9,9 @@ export default function VideoComparison() {
   const [prev, setPrev] = useState(0)
   const [latest, setLatest] = useState(2)
   const videos = [
-    { t: 'Net Session – Jan 2026', d: '1:24' },
-    { t: 'Match Spell – Feb 2026', d: '1:18' },
-    { t: 'Bowling Session – Apr 2026', d: '1:36' },
+    { t: 'Technique Run – Jan 2026', d: '1:24' },
+    { t: 'Time Trial – Feb 2026', d: '1:18' },
+    { t: 'Sprint Session – Apr 2026', d: '1:36' },
   ]
 
   const deltas = COMPARE.metrics.map((m) => ({

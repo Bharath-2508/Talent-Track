@@ -1,8 +1,10 @@
 import { FormEvent, ReactNode, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Zap, Mail, Lock, User, Calendar, MapPin, Target, BarChart3, Eye, EyeOff, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Zap, Mail, Lock, User, Calendar, MapPin, Target, BarChart3, Eye, EyeOff, ArrowRight, CheckCircle2, AlertCircle, Building } from 'lucide-react'
 import { Card } from '../components/ui'
 import { cx } from '../components/ui'
+
+const API_BASE = 'http://localhost:8000/api'
 
 function AuthShell({ children, aside }: { children: ReactNode; aside: ReactNode }) {
   return (
@@ -33,7 +35,7 @@ function AuthShell({ children, aside }: { children: ReactNode; aside: ReactNode 
         <div className="auth-points">
           <div className="auth-point">
             <div className="ap-ic"><BarChart3 /></div>
-            Sport-specific AI performance reports
+            Running / Sprinting AI performance reports
           </div>
           <div className="auth-point">
             <div className="ap-ic"><Target /></div>
@@ -49,15 +51,23 @@ function AuthShell({ children, aside }: { children: ReactNode; aside: ReactNode 
   )
 }
 
-function PasswordInput({ placeholder }: { placeholder: string }) {
+function PasswordInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   const [show, setShow] = useState(false)
   return (
     <div style={{ position: 'relative' }}>
-      <input type={show ? 'text' : 'password'} className="input" placeholder={placeholder} required style={{ paddingRight: 44 }} />
+      <input
+        type={show ? 'text' : 'password'}
+        className="input"
+        placeholder={placeholder}
+        required
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{ paddingRight: 44 }}
+      />
       <button
         type="button"
         onClick={() => setShow(!show)}
-        style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-dim)' }}
+        style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer' }}
       >
         {show ? <EyeOff size={17} /> : <Eye size={17} />}
       </button>
@@ -67,10 +77,38 @@ function PasswordInput({ placeholder }: { placeholder: string }) {
 
 export function PlayerLogin() {
   const navigate = useNavigate()
-  const submit = (e: FormEvent) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
-    navigate('/player/dashboard')
+    setError(null)
+    setLoading(true)
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role: 'PLAYER' }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.detail || 'Login failed. Please check your credentials.')
+      }
+
+      localStorage.setItem('tt_user', JSON.stringify(data.user))
+      localStorage.setItem('tt_token', data.token)
+      navigate('/player/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Server connection error.')
+    } finally {
+      setLoading(false)
+    }
   }
+
   return (
     <AuthShell
       aside={
@@ -86,17 +124,33 @@ export function PlayerLogin() {
           <div className="auth-sub" style={{ marginBottom: 0 }}>Welcome back, athlete</div>
         </div>
       </div>
+
+      {error && (
+        <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#fca5a5', fontSize: 13, marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <AlertCircle size={16} />
+          {error}
+        </div>
+      )}
+
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 }}>
         <div className="field">
           <label className="label">Email</label>
           <div style={{ position: 'relative' }}>
-            <input type="email" className="input" placeholder="you@example.com" required style={{ paddingLeft: 42 }} />
+            <input
+              type="email"
+              className="input"
+              placeholder="you@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ paddingLeft: 42 }}
+            />
             <Mail size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
           </div>
         </div>
         <div className="field">
           <label className="label">Password</label>
-          <PasswordInput placeholder="Enter your password" />
+          <PasswordInput value={password} onChange={setPassword} placeholder="Enter your password" />
         </div>
         <div className="flex between">
           <label className="flex" style={{ gap: 8, fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer' }}>
@@ -104,8 +158,8 @@ export function PlayerLogin() {
           </label>
           <Link to="/player/login" className="link tiny">Forgot Password?</Link>
         </div>
-        <button type="submit" className="btn btn-primary btn-block btn-lg">
-          Login <ArrowRight size={17} />
+        <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'} <ArrowRight size={17} />
         </button>
       </form>
       <div className="divider">OR</div>
@@ -118,11 +172,57 @@ export function PlayerLogin() {
 
 export function PlayerRegister() {
   const navigate = useNavigate()
-  const submit = (e: FormEvent) => {
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [dob, setDob] = useState('')
+  const [gender, setGender] = useState('Male')
+  const [location, setLocation] = useState('')
+  const [primarySport] = useState('Running / Sprinting')
+  const [experience, setExperience] = useState('Intermediate')
+  const [position, setPosition] = useState('Sprinter')
+  
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
-    navigate('/player/dashboard')
+    setError(null)
+    setLoading(true)
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: 'PLAYER',
+          full_name: fullName,
+          email,
+          password,
+          dob,
+          gender,
+          location,
+          primary_sport: primarySport,
+          experience,
+          position,
+        }),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.detail || 'Registration failed.')
+      }
+
+      localStorage.setItem('tt_user', JSON.stringify(data.user))
+      localStorage.setItem('tt_token', data.token)
+      navigate('/player/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Server connection error.')
+    } finally {
+      setLoading(false)
+    }
   }
-  const sports = ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Athletics', 'Other']
+
   return (
     <AuthShell
       aside={
@@ -135,87 +235,116 @@ export function PlayerRegister() {
         <span style={{ fontSize: 30 }}>🚀</span>
         <div>
           <div className="auth-title">Create Athlete Profile</div>
-          <div className="auth-sub" style={{ marginBottom: 0 }}>Join TalentTrack AI in under 2 minutes</div>
+          <div className="auth-sub" style={{ marginBottom: 0 }}>Join TalentTrack AI (Saved to Excel)</div>
         </div>
       </div>
-      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 22 }} className="auth-form">
+
+      {error && (
+        <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#fca5a5', fontSize: 13, marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <AlertCircle size={16} />
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 18 }} className="auth-form">
         <div className="field">
           <label className="label">Full Name</label>
           <div style={{ position: 'relative' }}>
-            <input className="input" placeholder="e.g. Arjun Sharma" required style={{ paddingLeft: 42 }} />
+            <input
+              className="input"
+              placeholder="e.g. Arjun Sharma"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              style={{ paddingLeft: 42 }}
+            />
             <User size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
           </div>
         </div>
         <div className="field">
           <label className="label">Email</label>
           <div style={{ position: 'relative' }}>
-            <input type="email" className="input" placeholder="you@example.com" required style={{ paddingLeft: 42 }} />
+            <input
+              type="email"
+              className="input"
+              placeholder="you@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ paddingLeft: 42 }}
+            />
             <Mail size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
           </div>
         </div>
         <div className="field">
           <label className="label">Password</label>
-          <PasswordInput placeholder="Create a strong password" />
+          <PasswordInput value={password} onChange={setPassword} placeholder="Create a strong password" />
         </div>
         <div className="field-row">
           <div className="field">
             <label className="label">Date of Birth</label>
             <div style={{ position: 'relative' }}>
-              <input type="date" className="input" required style={{ paddingLeft: 42 }} />
+              <input
+                type="date"
+                className="input"
+                required
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                style={{ paddingLeft: 42 }}
+              />
               <Calendar size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
             </div>
           </div>
           <div className="field">
             <label className="label">Gender</label>
-            <select className="select" defaultValue="">
-              <option value="" disabled>Select gender</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Prefer not to say</option>
+            <select className="select" value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Prefer not to say">Prefer not to say</option>
             </select>
           </div>
         </div>
         <div className="field">
           <label className="label">Location</label>
           <div style={{ position: 'relative' }}>
-            <input className="input" placeholder="City, State" required style={{ paddingLeft: 42 }} />
+            <input
+              className="input"
+              placeholder="City, State"
+              required
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              style={{ paddingLeft: 42 }}
+            />
             <MapPin size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
           </div>
         </div>
         <div className="field-row">
           <div className="field">
             <label className="label">Primary Sport</label>
-            <select className="select" defaultValue="">
-              <option value="" disabled>Select sport</option>
-              {sports.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
+            <div className="select" style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'default' }}>
+              🏃 Running / Sprinting
+            </div>
           </div>
           <div className="field">
             <label className="label">Experience Level</label>
-            <select className="select" defaultValue="">
-              <option value="" disabled>Select experience</option>
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
+            <select className="select" value={experience} onChange={(e) => setExperience(e.target.value)}>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
             </select>
           </div>
         </div>
         <div className="field">
-          <label className="label">Playing Position</label>
-          <select className="select" defaultValue="">
-            <option value="" disabled>Select position</option>
-            <option>Fast Bowler</option>
-            <option>Spin Bowler</option>
-            <option>Batsman (Top Order)</option>
-            <option>Wicket-Keeper</option>
-            <option>All-Rounder</option>
-            <option>Other</option>
-          </select>
+          <label className="label">Event / Position</label>
+          <input
+            className="input"
+            placeholder="e.g. Sprinter / 100m & 200m"
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+          />
         </div>
-        <button type="submit" className="btn btn-primary btn-block btn-lg">
-          Create Athlete Profile <ArrowRight size={17} />
+        <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>
+          {loading ? 'Creating Account...' : 'Create Athlete Profile'} <ArrowRight size={17} />
         </button>
       </form>
     </AuthShell>
@@ -224,11 +353,61 @@ export function PlayerRegister() {
 
 export function CoachLogin() {
   const navigate = useNavigate()
-  const [role, setRole] = useState('Coach')
-  const submit = (e: FormEvent) => {
+  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [role, setRole] = useState<'Coach' | 'Academy'>('Coach')
+  
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [location, setLocation] = useState('')
+  const [primarySport] = useState('Running / Sprinting')
+
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
-    navigate('/coach/dashboard')
+    setError(null)
+    setLoading(true)
+
+    const targetUrl = mode === 'register' ? `${API_BASE}/auth/register` : `${API_BASE}/auth/login`
+    const bodyData = mode === 'register'
+      ? {
+          role: role.toUpperCase(),
+          full_name: fullName,
+          email,
+          password,
+          location,
+          primary_sport: primarySport,
+        }
+      : {
+          role: role.toUpperCase(),
+          email,
+          password,
+        }
+
+    try {
+      const res = await fetch(targetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.detail || `${mode === 'register' ? 'Registration' : 'Login'} failed.`)
+      }
+
+      localStorage.setItem('tt_user', JSON.stringify(data.user))
+      localStorage.setItem('tt_token', data.token)
+      navigate('/coach/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Server connection error.')
+    } finally {
+      setLoading(false)
+    }
   }
+
   return (
     <AuthShell
       aside={
@@ -240,10 +419,11 @@ export function CoachLogin() {
       <div className="flex" style={{ gap: 10, marginBottom: 6 }}>
         <span style={{ fontSize: 30 }}>🛡️</span>
         <div>
-          <div className="auth-title">Coach & Academy Login</div>
+          <div className="auth-title">{mode === 'login' ? 'Coach & Academy Login' : 'Register Coach / Academy'}</div>
           <div className="auth-sub" style={{ marginBottom: 0 }}>Recruit your next star athlete</div>
         </div>
       </div>
+
       <div className="role-toggle mt-3">
         <button type="button" className={cx('role-opt', role === 'Coach' && 'active')} onClick={() => setRole('Coach')}>
           Coach
@@ -252,24 +432,86 @@ export function CoachLogin() {
           Academy
         </button>
       </div>
-      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 22 }}>
+
+      {error && (
+        <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#fca5a5', fontSize: 13, marginTop: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <AlertCircle size={16} />
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 18 }}>
+        {mode === 'register' && (
+          <div className="field">
+            <label className="label">{role === 'Coach' ? 'Full Name' : 'Academy Name'}</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="input"
+                placeholder={role === 'Coach' ? 'Coach Ravi Kumar' : 'Velocity Sports Academy'}
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                style={{ paddingLeft: 42 }}
+              />
+              <User size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+            </div>
+          </div>
+        )}
+
         <div className="field">
           <label className="label">Email</label>
           <div style={{ position: 'relative' }}>
-            <input type="email" className="input" placeholder="coach@academy.com" required style={{ paddingLeft: 42 }} />
+            <input
+              type="email"
+              className="input"
+              placeholder="coach@academy.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ paddingLeft: 42 }}
+            />
             <Mail size={17} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
           </div>
         </div>
+
         <div className="field">
           <label className="label">Password</label>
-          <PasswordInput placeholder="Enter your password" />
+          <PasswordInput value={password} onChange={setPassword} placeholder="Enter your password" />
         </div>
+
+        {mode === 'register' && (
+          <div className="field-row">
+            <div className="field">
+              <label className="label">Location</label>
+              <input
+                className="input"
+                placeholder="City, State"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label className="label">Sport Focus</label>
+              <div className="select" style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'default' }}>
+                🏃 Running / Sprinting
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex between">
           <span className="tiny dim">Signing in as: <b style={{ color: 'var(--text)' }}>{role}</b></span>
-          <Link to="/coach/login" className="link tiny">Forgot Password?</Link>
+          <button
+            type="button"
+            className="link tiny"
+            onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+          >
+            {mode === 'login' ? 'Need an account? Register' : 'Already registered? Login'}
+          </button>
         </div>
-        <button type="submit" className="btn btn-primary btn-block btn-lg">
-          Login as {role} <ArrowRight size={17} />
+
+        <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>
+          {loading ? 'Processing...' : `${mode === 'login' ? 'Login' : 'Register'} as ${role}`} <ArrowRight size={17} />
         </button>
       </form>
     </AuthShell>

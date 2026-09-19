@@ -42,7 +42,7 @@ export default function CoachDashboard() {
         <Card glow pad>
           <SectionHead
             title="AI Recommended Players"
-            sub="Top matches for your open cricket & football trials"
+            sub="Top matches for your open running & sprinting trials"
             action={<Link to="/coach/recommendations" className="link small">View all</Link>}
           />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -74,7 +74,7 @@ export default function CoachDashboard() {
             <SectionHead title="Recruitment Overview" sub="Players per sport this month" />
             <div style={{ height: 200 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={[{ name: 'Cricket', players: 64 }, { name: 'Football', players: 48 }, { name: 'Basketball', players: 18 }, { name: 'Volleyball', players: 8 }, { name: 'Athletics', players: 4 }]}>
+                <BarChart data={[{ name: 'Running / Sprinting', players: 64 }]}>
                   <defs>
                     <linearGradient id="cb" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#3d8bff" />
@@ -115,7 +115,7 @@ export default function CoachDashboard() {
             <div className="stat-icon"><Cpu /></div>
             <div>
               <div style={{ fontWeight: 700 }}>AI scout brief</div>
-              <div className="tiny dim">3 high-potential fast bowlers matched your speed &gt; 84, balance &gt; 80 criteria</div>
+              <div className="tiny dim">3 high-potential sprinters matched your speed &gt; 84, balance &gt; 80 criteria</div>
             </div>
           </div>
           <div className="flex gap-2">

@@ -40,7 +40,7 @@ export default function TalentSearch() {
     <Layout nav={COACH_NAV} title="Search Players" crumb="Search Players" portal="coach" notifCount={3}>
       <SectionHead
         title="Search Players"
-        sub={`${list.length} athletes found · results are strictly filtered by the selected sport`}
+        sub={`${list.length} athletes found · results are strictly filtered to running / sprinting`}
         action={
           <div className="flex gap-2">
             <Pill color="pill-blue"><SlidersHorizontal size={12} /> Smart filters</Pill>
@@ -52,7 +52,7 @@ export default function TalentSearch() {
         <div className="flex gap-2 mb-3 wrap">
           <div className="search-bar">
             <Search />
-            <input className="input" placeholder="Search by name or skill (e.g. yorkers)" value={query} onChange={(e) => setQuery(e.target.value)} />
+            <input className="input" placeholder="Search by name or skill (e.g. sprint)" value={query} onChange={(e) => setQuery(e.target.value)} />
           </div>
           <button className="btn btn-outline">Filter</button>
           <button className="btn btn-ghost">Reset</button>
@@ -61,7 +61,7 @@ export default function TalentSearch() {
           <div className="field">
             <label className="label">Sport</label>
             <select className="select" value={sport} onChange={(e) => setSport(e.target.value as Sport | 'all')}>
-              <option value="all">All Sports</option>
+              <option value="all">Running / Sprinting</option>
               {SPORTS.map((s) => (
                 <option key={s} value={s}>{SPORT_META[s].icon} {SPORT_META[s].label}</option>
               ))}

@@ -50,11 +50,9 @@ export default function Settings({ portal }: { portal: 'player' | 'coach' }) {
                 </div>
                 <div className="field">
                   <label className="label">Sport</label>
-                  <select className="select" value={sport} onChange={(e) => setSport(e.target.value as Sport)}>
-                    {(Object.keys(SPORT_META) as Sport[]).map((s) => (
-                      <option key={s} value={s}>{SPORT_META[s].label}</option>
-                    ))}
-                  </select>
+                  <div className="select" style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'default' }}>
+                    {SPORT_META[sport].icon} {SPORT_META[sport].label}
+                  </div>
                 </div>
               </div>
             ) : (

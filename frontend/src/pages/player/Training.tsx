@@ -11,7 +11,7 @@ const TYPE_STYLE: Record<string, { icon: string; pill: string }> = {
   Skill: { icon: '🎯', pill: 'pill-purple' },
   Recovery: { icon: '🧘', pill: 'pill-green' },
   Strength: { icon: '🏋️', pill: 'pill-amber' },
-  Match: { icon: '🏏', pill: 'pill-cyan' },
+  Race: { icon: '🏁', pill: 'pill-cyan' },
 }
 
 export default function TrainingPlan() {
@@ -54,7 +54,7 @@ export default function TrainingPlan() {
             {[
               { icon: <Flame size={17} />, t: 'Sprint Acceleration', d: '4 × 60m flying sprints · 3 min rest', dur: '45 min', type: 'Speed' },
               { icon: <Dumbbell size={17} />, t: 'Balance & Footwork Circuit', d: 'Bosu + ladder drills targeting balance (81 → 85)', dur: '35 min', type: 'Skill' },
-              { icon: <Play size={17} />, t: 'Bowling Action Drill', d: 'Front-arm + follow-through with weighted ball', dur: '40 min', type: 'Skill' },
+              { icon: <Play size={17} />, t: 'Sprint Technique Drill', d: 'Posture + knee drive with resistance bands', dur: '40 min', type: 'Skill' },
               { icon: <Moon size={17} />, t: 'Recovery Protocol', d: 'Mobility, foam rolling, 20 min meditation', dur: '25 min', type: 'Recovery' },
             ].map((m) => (
               <div key={m.t} className="flex" style={{ gap: 13 }}>
@@ -76,13 +76,13 @@ export default function TrainingPlan() {
           <div className="ai-insight mb-2">
             <SparkIcon />
             <span>
-              Your balance (81) and knee lift are the priority. Add the Tuesday footwork circuit <b>before</b> every bowling session this month.
+              Your balance (81) and knee drive are the priority. Add the Tuesday arm drive circuit <b>before</b> every sprint session this month.
             </span>
           </div>
           <div className="ai-insight">
             <CalendarCheck size={20} color="#34d399" style={{ flexShrink: 0 }} />
             <span>
-              Saturday practice match is critical — apply the follow-through corrections in live overs, not just nets.
+              Saturday time trial is critical — apply the speed endurance and stride-length corrections in race conditions.
             </span>
           </div>
           <div className="mt-3">

@@ -13,10 +13,10 @@ export default function Recommendations() {
     <Layout nav={COACH_NAV} title="AI Player Recommendations" crumb="AI Recommendations" portal="coach" notifCount={3}>
       <SectionHead
         title="AI Recommended Athletes"
-        sub="Based on your requirement: Football · Age 16–18 · Speed > 85 · Balance > 80"
+        sub="Based on your requirement: Running / Sprinting · Age 16–18 · Speed > 85 · Balance > 80"
         action={
           <div className="flex gap-2 wrap">
-            <Pill color="pill-blue">⚽ Football</Pill>
+            <Pill color="pill-blue">🏃 Running / Sprinting</Pill>
             <Pill>Age 16–18</Pill>
             <Pill>Speed &gt; 85</Pill>
             <Pill>Balance &gt; 80</Pill>

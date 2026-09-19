@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.health import router as health_router
+from .api.auth import router as auth_router
 from .config import settings
 from .database import Base, engine
 
@@ -40,6 +41,7 @@ app.add_middleware(
 )
 
 app.include_router(health_router, prefix=settings.API_V1_PREFIX)
+app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")

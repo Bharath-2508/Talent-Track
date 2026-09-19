@@ -15,9 +15,9 @@ type Invite = {
 }
 
 const SENT: Invite[] = [
-  { id: 5, name: 'Daniel Fernandes', sport: 'Football', trial: 'ISL Reserve Team Trials', status: 'Accepted', date: 'Aug 12, 2026' },
-  { id: 2, name: 'Vikram Reddy', sport: 'Cricket', trial: 'TNPL District Trials', status: 'Pending', date: 'Aug 13, 2026' },
-  { id: 9, name: 'Meera Iyer', sport: 'Basketball', trial: 'NBA India Hoop Camps', status: 'Declined', date: 'Aug 10, 2026' },
+  { id: 5, name: 'Daniel Fernandes', sport: 'Running', trial: 'State Sprint Camp Trials', status: 'Accepted', date: 'Aug 12, 2026' },
+  { id: 2, name: 'Vikram Reddy', sport: 'Running', trial: 'AFI District Talent Trials', status: 'Pending', date: 'Aug 13, 2026' },
+  { id: 9, name: 'Meera Iyer', sport: 'Running', trial: 'Club Track & Field Selection', status: 'Declined', date: 'Aug 10, 2026' },
 ]
 
 const STATUS: Record<string, { pill: string; icon: React.ReactNode }> = {

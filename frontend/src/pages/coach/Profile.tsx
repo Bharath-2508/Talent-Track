@@ -38,9 +38,9 @@ export default function CoachProfile() {
         <Card pad>
           <SectionHead title="Specializations" />
           <div className="flex gap-2 wrap">
-            <Pill color="pill-blue">🏏 Cricket Scouting</Pill>
-            <Pill color="pill-green">⚽ Football Scouting</Pill>
-            <Pill>Pace Bowling Development</Pill>
+            <Pill color="pill-blue">🏃 Sprint Athletes</Pill>
+            <Pill color="pill-green">🏁 Speed & Technique</Pill>
+            <Pill>Performance Development</Pill>
             <Pill>Youth Talent ID</Pill>
             <Pill>Match Analysis</Pill>
           </div>
@@ -55,7 +55,7 @@ export default function CoachProfile() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               { icon: '🎓', t: 'B.P.Ed – Sports Coaching', s: 'TN University · 2016' },
-              { icon: '🏆', t: 'NCA Level 2 Fast Bowling Coach', s: 'BCCI NCA · 2019' },
+              { icon: '🏆', t: 'AFI Level 2 Sprint Coach', s: 'Athletics Federation of India · 2019' },
               { icon: '⭐', t: 'Top 5% Scout Rating', s: 'TalentTrack AI · 2026' },
               { icon: '🏅', t: 'FIFA Talent Coach Certificate', s: 'AIFF · 2021' },
             ].map((c) => (
@@ -77,7 +77,7 @@ export default function CoachProfile() {
           <SectionHead title="About" />
           <p className="muted small">
             {COACH.name} is a talent identification specialist at {COACH.academy} with 9 years of experience scouting youth
-            cricket and football. Leverages TalentTrack AI analytics to shortlist players based on objective AI performance
+            running and sprinting. Leverages TalentTrack AI analytics to shortlist athletes based on objective AI performance
             scores rather than bias. Has helped 40+ athletes reach district and state level.
           </p>
           <Link to="/coach/dashboard" className="btn btn-primary btn-sm mt-3">Back to Dashboard</Link>

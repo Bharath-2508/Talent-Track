@@ -20,3 +20,8 @@ backend/sportsverse.db
 # Logs
 *.log
 uvicorn*.log
+
+# Large media / datasets (not for VCS)
+Running Posture Analysis Dataset/
+Running Posture Analysis Dataset.zip
+*.mp4

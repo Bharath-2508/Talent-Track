@@ -39,10 +39,10 @@ export default function UploadVideo() {
   }
 
   return (
-    <Layout nav={PLAYER_NAV} title="Upload My Video" crumb="Upload Video" portal="player" notifCount={2}>
+    <Layout nav={PLAYER_NAV} title="Upload Running / Sprinting Video" crumb="Upload Video" portal="player" notifCount={2}>
       <SectionHead
-        title="Upload My Practice Video"
-        sub={`Our AI will analyze my ${meta.label.toLowerCase()} performance and detect my sport automatically.`}
+        title="Upload Running / Sprinting Video"
+        sub={`Our AI will analyze my ${meta.label.toLowerCase()} performance automatically.`}
       />
 
       <div className="grid grid-2">
@@ -106,10 +106,10 @@ export default function UploadVideo() {
             <SectionHead title="How AI Analysis Works" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {[
-                { n: '01', t: 'Upload video', d: 'Record your practice session in good lighting, full body in frame.' },
-                { n: '02', t: 'AI detects sport', d: `The model identifies your sport — ${meta.label} — with a confidence score.` },
+                { n: '01', t: 'Upload video', d: 'Record your running session in good lighting, full body in frame.' },
+                { n: '02', t: 'AI locks analysis', d: `Your biomechanics are analyzed — ${meta.label} — with a confidence score.` },
                 { n: '03', t: 'Pose analysis', d: '20+ biomechanical metrics are computed frame by frame.' },
-                { n: '04', t: 'Personalized plan', d: 'Training, learning videos and insights tailored to your sport.' },
+                { n: '04', t: 'Personalized plan', d: 'Training, learning videos and insights tailored to your running form.' },
               ].map((s) => (
                 <div key={s.n} className="flex" style={{ gap: 14, alignItems: 'flex-start' }}>
                   <div className="step-num" style={{ width: 30, height: 30, margin: 0, flexShrink: 0, fontSize: 12 }}>{s.n}</div>

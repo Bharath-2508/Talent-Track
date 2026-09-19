@@ -24,7 +24,7 @@ export default function LearningHub() {
     <Layout nav={PLAYER_NAV} title="My Learning Hub" crumb="Learning Hub" portal="player" notifCount={2}>
       <SectionHead
         title="Learn From The Best"
-        sub={`AI-curated ${meta.label} training videos based on my weaknesses (Low Knee Lift · Weak Footwork)`}
+        sub={`AI-curated ${meta.label} training videos based on my weaknesses (Low Knee Drive · Arm Swing Imbalance)`}
         action={
           <div className="flex gap-2">
             <Pill color="pill-blue">{meta.icon} {meta.label} only</Pill>
@@ -36,7 +36,7 @@ export default function LearningHub() {
       <div className="ai-insight mb-4">
         <Cpu />
         <span>
-          <b>AI detected: Weak Bowling Action & Low Knee Lift.</b> The videos below were selected only from {meta.label} content to directly address these areas. Unrelated sports are never recommended.
+          <b>AI detected: Low Knee Drive & Arm Swing Imbalance.</b> The videos below were selected only from {meta.label} content to directly address these areas. Unrelated sports are never recommended.
         </span>
       </div>
 

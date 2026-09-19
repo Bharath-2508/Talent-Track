@@ -53,7 +53,7 @@ export function Layout({
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { sport } = useAthlete()
+  const { sport, athlete } = useAthlete()
 
   useEffect(() => {
     setOpen(false)
@@ -139,10 +139,10 @@ export function Layout({
         </nav>
 
         <div className="side-user">
-          <Avatar index={portal === 'player' ? 1 : 3} size={40} name={portal === 'player' ? 'Arjun Sharma' : 'Coach Ravi'} />
+          <Avatar index={portal === 'player' ? 1 : 3} size={40} name={athlete.name || (portal === 'player' ? 'Athlete' : 'Coach')} />
           <div className="side-user-info">
-            <div className="side-user-name">{portal === 'player' ? 'Arjun Sharma' : 'Coach Ravi Kumar'}</div>
-            <div className="side-user-role">{portal === 'player' ? 'Fast Bowler · Cricket' : 'Recruitment Scout'}</div>
+            <div className="side-user-name">{athlete.name || (portal === 'player' ? 'Registered Athlete' : 'Registered Coach')}</div>
+            <div className="side-user-role">{portal === 'player' ? 'Sprinter · Running / Sprinting' : 'Recruitment Scout'}</div>
           </div>
         </div>
       </aside>

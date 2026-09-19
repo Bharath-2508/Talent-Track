@@ -69,7 +69,7 @@ export default function Resume() {
 
         <div className="r-sec-title">Key Skills</div>
         <div className="flex wrap gap-1">
-          {['Pace 138 km/h', 'Swing Bowling', 'Accurate Yorkers', 'Fielding', 'Fitness 8.5/10', ...STRENGTHS.map((s) => s.replace('Excellent ', '')).slice(0, 2)].map((s) => (
+          {['Top Speed 36.2 km/h', 'Smooth Stride Rhythm', 'Fast Reactivity', 'Fitness 8.5/10', ...STRENGTHS.map((s) => s.replace('Excellent ', '')).slice(0, 2)].map((s) => (
             <span key={s} style={{ background: '#eef2ff', color: '#4338ca', padding: '4px 10px', borderRadius: 6, fontSize: 12.5, fontWeight: 600 }}>{s}</span>
           ))}
         </div>

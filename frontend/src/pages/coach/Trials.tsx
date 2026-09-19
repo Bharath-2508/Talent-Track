@@ -8,7 +8,7 @@ import { TRIALS, SPORT_META, Sport, SPORTS } from '../../data/mock'
 export default function CoachTrials() {
   const [showForm, setShowForm] = useState(false)
   const [created, setCreated] = useState(false)
-  const mine = TRIALS.filter((t) => t.sport === 'cricket' || t.sport === 'football').slice(0, 3)
+  const mine = TRIALS.filter((t) => t.sport === 'running').slice(0, 3)
 
   const publish = (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,7 +36,7 @@ export default function CoachTrials() {
             <div className="field-row">
               <div className="field">
                 <label className="label">Trial Name</label>
-                <input className="input" placeholder="e.g. Fast Bowler Selection Camp" required />
+                <input className="input" placeholder="e.g. Sprint Qualifier Camp" required />
               </div>
               <div className="field">
                 <label className="label">Sport</label>
@@ -91,7 +91,7 @@ export default function CoachTrials() {
               <button type="submit" className="btn btn-primary"><Plus size={15} /> Publish Trial</button>
               <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
-            {created && <div className="pill pill-green"><CheckCircle2 size={13} /> Trial published! Athletes in your sport can now apply.</div>}
+            {created && <div className="pill pill-green"><CheckCircle2 size={13} /> Trial published! Sprint athletes can now apply.</div>}
           </form>
         </Card>
       )}

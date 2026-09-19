@@ -51,6 +51,7 @@ coming soon"** — the system never fabricates analysis.
 | Storage   | Cloudinary |
 | Deploy    | Vercel (frontend), Render (backend), Neon (DB) |
 
+
 ## Repository Structure
 
 ```
