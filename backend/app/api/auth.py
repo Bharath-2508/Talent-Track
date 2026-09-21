@@ -1,11 +1,29 @@
-from typing import Optional, List
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel, EmailStr
+"""Auth API — register, login, get current user.
 
-from ..services.excel_storage import save_user_to_excel, get_user_by_email, get_all_users
+Uses SQLAlchemy for user storage, bcrypt for password hashing,
+and python-jose for JWT signing.  Passwords are NEVER stored plain-text.
+"""
+from datetime import datetime, timedelta, timezone
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from jose import jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
+
+from ..config import settings
+from ..database import get_db
+from ..models import Role, RoleName, User
+from ..models.profile import AthleteProfile, CoachProfile
+from .deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# ── Schemas ──────────────────────────────────────────────────────────────────
 
 class RegisterSchema(BaseModel):
     email: str
@@ -16,7 +34,7 @@ class RegisterSchema(BaseModel):
     gender: Optional[str] = ""
     dob: Optional[str] = ""
     location: Optional[str] = ""
-    experience: Optional[str] = ""
+    experience: Optional[str] = "Beginner"
     position: Optional[str] = ""
 
 
@@ -26,90 +44,167 @@ class LoginSchema(BaseModel):
     role: Optional[str] = None
 
 
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def _hash(plain: str) -> str:
+    return pwd_ctx.hash(plain)
+
+
+def _verify(plain: str, hashed: str) -> bool:
+    return pwd_ctx.verify(plain, hashed)
+
+
+def _make_token(user_id: int) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return jwt.encode(
+        {"sub": str(user_id), "exp": expire},
+        settings.JWT_SECRET,
+        algorithm=settings.JWT_ALGORITHM,
+    )
+
+
+def _user_dict(user: User, token: str) -> dict:
+    profile = getattr(user, "_profile", None)
+    return {
+        "id": user.id,
+        "full_name": user.full_name,
+        "email": user.email,
+        "role": user.role.name,
+        "primary_sport": getattr(profile, "primary_sport_slug", "athletics") if profile else "athletics",
+        "gender": getattr(profile, "gender", "") if profile else "",
+        "location": getattr(profile, "location", "") if profile else "",
+        "experience": f"{getattr(profile, 'experience_years', 0)} years" if profile else "",
+        "position": getattr(profile, "position", "") if profile else "",
+        "token": token,
+    }
+
+
+# ── Endpoints ─────────────────────────────────────────────────────────────────
+
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(data: RegisterSchema):
+def register(data: RegisterSchema, db: Session = Depends(get_db)):
     if not data.email or not data.password or not data.full_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email, password, and full name are required.",
+        raise HTTPException(status_code=400, detail="Email, password and full name are required.")
+
+    existing = db.query(User).filter(User.email == data.email.strip().lower()).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="An account with this email already exists.")
+
+    role_name = (data.role or "PLAYER").upper()
+    role = db.query(Role).filter(Role.name == role_name).first()
+    if not role:
+        raise HTTPException(status_code=400, detail=f"Role '{role_name}' not found.")
+
+    user = User(
+        email=data.email.strip().lower(),
+        password_hash=_hash(data.password),
+        full_name=data.full_name.strip(),
+        role_id=role.id,
+        is_active=True,
+    )
+    db.add(user)
+    db.flush()  # get user.id before committing
+
+    if role_name == "PLAYER":
+        profile = AthleteProfile(
+            user_id=user.id,
+            gender=data.gender or "",
+            location=data.location or "",
+            position=data.position or "",
+            experience_years=0,
+            bio="",
         )
-    
-    try:
-        user_info = save_user_to_excel(data.model_dump())
-        return {
-            "success": True,
-            "message": "User registered successfully and saved to Excel.",
-            "user": user_info,
-            "token": f"excel_jwt_{user_info['id']}_{user_info['email']}",
-        }
-    except ValueError as err:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(err),
+        db.add(profile)
+    elif role_name in ("COACH", "ACADEMY", "ADMIN"):
+        profile = CoachProfile(
+            user_id=user.id,
+            location=data.location or "",
+            bio="",
         )
-    except Exception as err:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error writing to Excel: {str(err)}",
-        )
+        db.add(profile)
+
+    db.commit()
+    db.refresh(user)
+
+    token = _make_token(user.id)
+    return {
+        "success": True,
+        "message": "Account created successfully.",
+        "user": {
+            "id": user.id,
+            "full_name": user.full_name,
+            "email": user.email,
+            "role": role_name,
+            "primary_sport": data.primary_sport or "Running / Sprinting",
+            "gender": data.gender or "",
+            "location": data.location or "",
+            "experience": data.experience or "Beginner",
+            "position": data.position or "",
+            "token": token,
+        },
+    }
 
 
 @router.post("/login")
-def login(data: LoginSchema):
+def login(data: LoginSchema, db: Session = Depends(get_db)):
     if not data.email or not data.password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email and password are required.",
-        )
-        
-    user = get_user_by_email(data.email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password.",
-        )
-        
-    if user.get("Password") != data.password:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password.",
-        )
-        
-    user_role = user.get("Role", "PLAYER").upper()
-    if data.role and data.role.upper() != user_role:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Account is registered as {user_role}, not {data.role.upper()}.",
-        )
+        raise HTTPException(status_code=400, detail="Email and password are required.")
 
-    user_info = {
-        "id": user.get("ID"),
-        "role": user_role,
-        "full_name": user.get("Full Name"),
-        "email": user.get("Email"),
-        "primary_sport": user.get("Primary Sport"),
-        "gender": user.get("Gender"),
-        "dob": user.get("Date of Birth"),
-        "location": user.get("Location"),
-        "experience": user.get("Experience Level"),
-        "position": user.get("Playing Position"),
-        "created_at": user.get("Created At"),
-    }
+    user = db.query(User).filter(User.email == data.email.strip().lower()).first()
+    if not user or not _verify(data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid email or password.")
+
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account is deactivated.")
+
+    if data.role:
+        required = data.role.upper()
+        if user.role.name != required:
+            # Allow coaches to also login via ACADEMY/ADMIN
+            if not (required == "COACH" and user.role.name in ("ACADEMY", "ADMIN")):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Account is registered as {user.role.name}, not {required}.",
+                )
+
+    token = _make_token(user.id)
+
+    # Load profile for extra fields
+    if user.role.name == "PLAYER":
+        profile = db.query(AthleteProfile).filter(AthleteProfile.user_id == user.id).first()
+    else:
+        profile = db.query(CoachProfile).filter(CoachProfile.user_id == user.id).first()
 
     return {
         "success": True,
         "message": "Login successful.",
-        "user": user_info,
-        "token": f"excel_jwt_{user_info['id']}_{user_info['email']}",
+        "user": {
+            "id": user.id,
+            "full_name": user.full_name,
+            "email": user.email,
+            "role": user.role.name,
+            "primary_sport": "Running / Sprinting",
+            "gender": getattr(profile, "gender", "") if profile else "",
+            "location": getattr(profile, "location", "") if profile else "",
+            "experience": f"{getattr(profile, 'experience_years', 0)} yrs" if profile else "",
+            "position": getattr(profile, "position", "") if profile else "",
+            "token": token,
+        },
     }
 
 
-@router.get("/users")
-def list_registered_users():
-    raw_users = get_all_users()
-    sanitized = []
-    for u in raw_users:
-        user_copy = dict(u)
-        user_copy.pop("Password", None)
-        sanitized.append(user_copy)
-    return {"count": len(sanitized), "users": sanitized}
+@router.get("/me")
+def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if user.role.name == "PLAYER":
+        profile = db.query(AthleteProfile).filter(AthleteProfile.user_id == user.id).first()
+    else:
+        profile = db.query(CoachProfile).filter(CoachProfile.user_id == user.id).first()
+    return {
+        "id": user.id,
+        "full_name": user.full_name,
+        "email": user.email,
+        "role": user.role.name,
+        "gender": getattr(profile, "gender", "") if profile else "",
+        "location": getattr(profile, "location", "") if profile else "",
+        "position": getattr(profile, "position", "") if profile else "",
+    }

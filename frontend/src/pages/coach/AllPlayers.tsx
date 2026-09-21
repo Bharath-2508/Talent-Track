@@ -1,103 +1,106 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, FileText, Users, UserX } from 'lucide-react'
+import { ArrowRight, FileText, Users, UserX, Star } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { COACH_NAV } from '../nav'
 import { Card, SectionHead, Pill, Avatar, ScoreChip } from '../../components/ui'
-import { SPORT_META, Sport } from '../../data/mock'
+import { api } from '../../lib/api'
 
-interface RegisteredUser {
-  ID: string
-  Role: string
-  'Full Name': string
-  Email: string
-  'Primary Sport': string
-  Gender: string
-  'Date of Birth': string
-  Location: string
-  'Experience Level': string
-  'Playing Position': string
-  'Created At': string
+interface Athlete {
+  id: number
+  user_id: number
+  name: string
+  sport: string
+  age?: number
+  gender?: string
+  location?: string
+  experience?: string
+  position?: string
+  ai_score?: number
+  shortlisted?: boolean
 }
 
 export default function AllPlayers() {
-  const [players, setPlayers] = useState<RegisteredUser[]>([])
+  const [players, setPlayers] = useState<Athlete[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/auth/users')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.users) {
-          // Filter users who are registered as PLAYER
-          const playerList = data.users.filter(
-            (u: RegisteredUser) => u.Role?.toUpperCase() === 'PLAYER'
-          )
-          setPlayers(playerList)
-        }
-      })
-      .catch((err) => console.error(err))
+    api.get<Athlete[]>('/coach/athletes')
+      .then(setPlayers)
+      .catch(console.error)
       .finally(() => setLoading(false))
   }, [])
 
+  const toggleShortlist = async (athlete: Athlete) => {
+    try {
+      if (athlete.shortlisted) {
+        await api.delete(`/coach/shortlist/${athlete.id}`)
+      } else {
+        await api.post(`/coach/shortlist/${athlete.id}`)
+      }
+      setPlayers(prev => prev.map(p => p.id === athlete.id ? { ...p, shortlisted: !p.shortlisted } : p))
+    } catch (e: any) {
+      alert(e.message)
+    }
+  }
+
   return (
-    <Layout nav={COACH_NAV} title="All Players" crumb="All Players" portal="coach" notifCount={3}>
+    <Layout nav={COACH_NAV} title="All Players" crumb="All Players" portal="coach" notifCount={0}>
       <SectionHead
-        title="All Registered Players"
-        sub={`${players.length} registered athletes in Excel database · open any player's report`}
-        action={<Pill color="pill-blue"><Users size={12} /> {players.length} players</Pill>}
+        title="All Registered Athletes"
+        sub={`${players.length} running athletes · view profiles and AI scores`}
+        action={<Pill color="pill-blue"><Users size={12} /> {players.length} athletes</Pill>}
       />
 
       {loading ? (
-        <Card pad style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '40px 0' }}>
-          Loading registered athletes...
-        </Card>
+        <div className="empty"><div className="empty-ic">⏳</div><h3>Loading athletes…</h3></div>
       ) : players.length === 0 ? (
         <Card pad style={{ textAlign: 'center', padding: '50px 20px' }}>
           <UserX size={48} style={{ margin: '0 auto 16px', color: 'var(--text-dim)' }} />
-          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>No Players Registered Yet</h3>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>No Athletes Registered Yet</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, maxWidth: 420, margin: '0 auto 20px' }}>
-            New player registrations will automatically be saved to Excel and appear here.
+            Athletes will appear here once they register and complete an analysis.
           </p>
-          <Link to="/player/register" className="btn btn-primary btn-sm">
-            Register New Player
-          </Link>
+          <Link to="/player/register" className="btn btn-primary btn-sm">Register as Athlete</Link>
         </Card>
       ) : (
         <div className="grid grid-4">
-          {players.map((p, i) => {
-            const rawSport = (p['Primary Sport'] || 'Running / Sprinting').toLowerCase() as Sport
-            const m = SPORT_META[rawSport] || SPORT_META['running']
-            const idNum = parseInt(p.ID, 10) || i + 1
-
-            return (
-              <Card key={p.ID} hover pad className="athlete-card" style={{ animationDelay: `${i * 0.03}s` }}>
-                <div className="ath-top">
-                  <Avatar name={p['Full Name']} index={idNum} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="ath-name">{p['Full Name']}</div>
-                    <div className="ath-meta">{m.icon} {p['Primary Sport']}</div>
-                  </div>
-                  <ScoreChip value={85} />
+          {players.map((p, i) => (
+            <Card key={p.id} hover pad className="athlete-card" style={{ animationDelay: `${i * 0.03}s` }}>
+              <div className="ath-top">
+                <Avatar name={p.name} index={p.id} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="ath-name">{p.name}</div>
+                  <div className="ath-meta">🏃 {p.sport}</div>
                 </div>
-                <div className="flex gap-1 wrap">
-                  <span className="pill">{p['Playing Position'] || 'Player'}</span>
-                  <span className="pill">{p['Experience Level'] || 'Intermediate'}</span>
-                  <span className="pill">📍 {p['Location'] || 'N/A'}</span>
-                </div>
-                <div className="flex gap-1 wrap">
-                  <span className="pill pill-blue">{p.Gender || 'Male'}</span>
-                  <span className="pill pill-green">Role: {p.Role}</span>
-                </div>
-                <div className="ath-foot">
-                  <span className="trend-up">Registered in Excel</span>
-                </div>
-                <Link to={`/coach/player/${p.ID}`} className="btn btn-primary btn-sm btn-block">
-                  View Profile <FileText size={13} />
+                {p.ai_score != null && <ScoreChip value={p.ai_score} />}
+              </div>
+              <div className="flex gap-1 wrap">
+                <span className="pill">{p.position || 'Sprinter'}</span>
+                <span className="pill">{p.experience || '—'}</span>
+                {p.location && <span className="pill">📍 {p.location}</span>}
+              </div>
+              <div className="flex gap-1 wrap">
+                {p.gender && <span className="pill pill-blue">{p.gender}</span>}
+                {p.ai_score != null
+                  ? <span className="pill pill-green">AI Score: {p.ai_score}</span>
+                  : <span className="pill">No analysis yet</span>
+                }
+              </div>
+              <div className="ath-foot">
+                <button
+                  className={`btn btn-sm ${p.shortlisted ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => toggleShortlist(p)}
+                  style={{ flex: 1 }}
+                >
+                  <Star size={13} /> {p.shortlisted ? 'Shortlisted' : 'Shortlist'}
+                </button>
+                <Link to={`/coach/player/${p.id}`} className="btn btn-outline btn-sm" style={{ flex: 1 }}>
+                  View <FileText size={13} />
                 </Link>
-              </Card>
-            )
-          })}
+              </div>
+            </Card>
+          ))}
         </div>
       )}
 
@@ -107,10 +110,10 @@ export default function AllPlayers() {
             <div className="stat-icon"><ArrowRight /></div>
             <div>
               <div style={{ fontWeight: 700 }}>Looking for something specific?</div>
-              <div className="tiny dim">Use filters for sport, age, location and AI metrics</div>
+              <div className="tiny dim">Use filters for age, gender, location and AI score</div>
             </div>
           </div>
-          <Link to="/coach/search" className="btn btn-primary btn-sm">Search Players</Link>
+          <Link to="/coach/search" className="btn btn-primary btn-sm">Advanced Search</Link>
         </div>
       </Card>
     </Layout>

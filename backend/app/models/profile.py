@@ -26,6 +26,8 @@ class AthleteProfile(BaseModel, TimestampMixin):
 
     user: Mapped["User"] = relationship("User", lazy="joined")  # noqa: F821
     primary_sport: Mapped["Sport"] = relationship("Sport", lazy="joined")  # noqa: F821
+    videos: Mapped[list["Video"]] = relationship("Video", back_populates="athlete", cascade="all, delete-orphan")  # noqa: F821
+
 
 
 class CoachProfile(BaseModel, TimestampMixin):

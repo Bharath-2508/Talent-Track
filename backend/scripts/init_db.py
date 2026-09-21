@@ -1,4 +1,4 @@
-"""Initialize the database schema and seed demo data.
+"""Initialize the database schema and seed essential data.
 
 Idempotent - safe to run multiple times.
 
@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.database import Base, SessionLocal, engine
 from app.data.sports import SPORTS
 from app.models import Role, RoleName, Sport
+from app.models.trial import Trial
 
 
 def seed_roles(db: Session) -> None:
@@ -45,6 +46,30 @@ def seed_sports(db: Session) -> None:
     print(f"Sports seeded: {count} new, {len(SPORTS)} in catalog.")
 
 
+def seed_trials(db: Session) -> None:
+    """Seed 4 demo running trials if none exist yet."""
+    if db.query(Trial).count() > 0:
+        print("Trials already seeded.")
+        return
+
+    from app.models import User
+    # Use first admin/coach user if available, else skip
+    admin_user = db.query(User).first()
+    if not admin_user:
+        print("No users yet — trials will be seeded on first coach registration.")
+        return
+
+    demo_trials = [
+        Trial(posted_by_id=admin_user.id, name="District 100m Sprinter Trials",   age_group="U-19",  location="Chennai",      date="Aug 22, 2027", org="SDAT",                        eligibility="District level, AI score 75+", positions=12, sport_slug="athletics"),
+        Trial(posted_by_id=admin_user.id, name="State Sprint Camp – U-19",         age_group="U-19",  location="Coimbatore",   date="Sep 05, 2027", org="Sports Development Authority", eligibility="Any district, AI score 70+",   positions=20, sport_slug="athletics"),
+        Trial(posted_by_id=admin_user.id, name="U-20 Sprint Combine",              age_group="U-20",  location="Patiala",      date="Oct 20, 2027", org="AFI",                         eligibility="100m under 11.2s",             positions=30, sport_slug="athletics"),
+        Trial(posted_by_id=admin_user.id, name="Club Track & Field Selection",     age_group="Open",  location="Delhi",        date="Oct 02, 2027", org="Delhi Athletics Club",        eligibility="District level",               positions=15, sport_slug="athletics"),
+    ]
+    db.add_all(demo_trials)
+    db.commit()
+    print(f"Seeded {len(demo_trials)} demo trials.")
+
+
 def main() -> None:
     print("Creating tables...")
     Base.metadata.create_all(bind=engine)
@@ -54,6 +79,7 @@ def main() -> None:
     try:
         seed_roles(db)
         seed_sports(db)
+        seed_trials(db)
     finally:
         db.close()
 

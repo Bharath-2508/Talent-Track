@@ -1,48 +1,61 @@
-import { Link } from 'react-router-dom'
-import { Wallet, CalendarDays, Building2, ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Layout } from '../../components/Layout'
 import { PLAYER_NAV } from '../nav'
 import { Card, SectionHead, Pill } from '../../components/ui'
-import { useAthlete } from '../../context/AthleteContext'
-import { SCHOLARSHIPS, SPORT_META } from '../../data/mock'
+import { api } from '../../lib/api'
+
+type Scholarship = {
+  id: number
+  name: string
+  org: string
+  type: string
+  amount: string
+  eligibility: string
+  deadline: string
+}
 
 export default function Scholarships() {
-  const { sport } = useAthlete()
-  const meta = SPORT_META[sport]
-  const list = SCHOLARSHIPS.filter((s) => s.sport === sport)
+  const [data, setData] = useState<Scholarship[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get<Scholarship[]>('/player/scholarships')
+      .then(setData)
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  const typeColor: Record<string, string> = {
+    Government: 'pill-blue', Private: 'pill-purple',
+    Academy: 'pill-green', 'Sports Quota': 'pill-cyan',
+  }
 
   return (
-    <Layout nav={PLAYER_NAV} title="Scholarships" crumb="Scholarships" portal="player" notifCount={2}>
-      <SectionHead
-        title="Opportunities For You"
-        sub={`Only ${meta.label} scholarships · filtered by your sport and eligibility`}
-        action={<Pill color="pill-blue">{meta.icon} {meta.label} only</Pill>}
-      />
-
-      <div className="grid grid-2">
-        {list.map((s) => (
-          <Card key={s.id} hover pad>
-            <div className="flex between gap-2">
-              <div className="flex" style={{ gap: 12 }}>
-                <div className="stat-icon"><Wallet /></div>
+    <Layout nav={PLAYER_NAV} title="Scholarships" crumb="Scholarships" portal="player" notifCount={0}>
+      <SectionHead title="Running Scholarships" sub="Funding opportunities for running / sprinting athletes" />
+      {loading ? (
+        <div className="empty"><div className="empty-ic">⏳</div><h3>Loading…</h3></div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {data.map((s) => (
+            <Card key={s.id} hover pad>
+              <div className="flex between wrap gap-3">
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{s.name}</div>
-                  <div className="tiny dim flex" style={{ gap: 5 }}><Building2 size={12} /> {s.org}</div>
+                  <div className="tiny dim mt-1">{s.org}</div>
+                  <div className="mt-2" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <Pill color={typeColor[s.type] || 'pill-blue'}>{s.type}</Pill>
+                    <Pill color="pill-green">💰 {s.amount}</Pill>
+                    <Pill color="pill-purple">📅 Deadline: {s.deadline}</Pill>
+                  </div>
+                  <div className="tiny dim mt-2">Eligibility: {s.eligibility}</div>
                 </div>
+                <button className="btn btn-outline btn-sm">Apply</button>
               </div>
-              <span className={`pill ${s.type === 'Government' ? 'pill-green' : s.type === 'Academy' ? 'pill-purple' : s.type === 'Sports Quota' ? 'pill-cyan' : 'pill-amber'}`}>{s.type}</span>
-            </div>
-            <div className="trial-meta mt-3">
-              <div className="trial-meta-row"><CalendarDays /> Deadline: {s.deadline}</div>
-              <div className="trial-meta-row">💸 Amount: <b style={{ color: 'var(--text)' }}>{s.amount}</b></div>
-              <div className="trial-meta-row">📌 Eligibility: {s.eligibility}</div>
-            </div>
-            <button className="btn btn-primary btn-sm btn-block mt-3">
-              Apply Now <ArrowRight size={14} />
-            </button>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </Layout>
   )
 }

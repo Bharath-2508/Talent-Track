@@ -15,10 +15,18 @@ email-validator==2.2.0
 # File uploads (multipart)
 python-multipart==0.0.20
 
-# Authentication (used from PHASE 2)
+# Async file I/O
+aiofiles==24.1.0
+
+# Authentication
 python-jose[cryptography]==3.3.0
-passlib==1.7.4
+passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
+
+# AI / Computer Vision
+mediapipe==0.10.14
+opencv-python==4.10.0.84
+numpy==1.26.4
 
 # Storage & Excel
 cloudinary==1.42.0
