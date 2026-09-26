@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 import openpyxl
+from openpyxl.styles import Font
+from openpyxl.worksheet.worksheet import Worksheet
 
 # Path to users excel file
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
@@ -31,12 +33,13 @@ def ensure_excel_file() -> None:
     if not EXCEL_PATH.exists():
         wb = openpyxl.Workbook()
         ws = wb.active
+        assert isinstance(ws, Worksheet)
         ws.title = "Users"
         ws.append(HEADERS)
         
         # Style headers
         for cell in ws[1]:
-            cell.font = openpyxl.styles.Font(bold=True)
+            cell.font = Font(bold=True)
             
         wb.save(EXCEL_PATH)
 
@@ -46,6 +49,7 @@ def get_all_users() -> List[Dict[str, str]]:
     ensure_excel_file()
     wb = openpyxl.load_workbook(EXCEL_PATH, data_only=True)
     ws = wb.active
+    assert isinstance(ws, Worksheet)
 
     users: List[Dict[str, str]] = []
     rows = list(ws.iter_rows(values_only=True))
@@ -88,6 +92,7 @@ def save_user_to_excel(user_data: Dict[str, str]) -> Dict[str, str]:
 
     wb = openpyxl.load_workbook(EXCEL_PATH)
     ws = wb.active
+    assert isinstance(ws, Worksheet)
     
     next_id = ws.max_row  # header is row 1, so max_row gives total count + 1 for next id
     created_at = datetime.utcnow().isoformat() + "Z"

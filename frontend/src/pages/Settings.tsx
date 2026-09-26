@@ -57,8 +57,8 @@ export default function Settings({ portal }: { portal: 'player' | 'coach' }) {
               </div>
             ) : (
               <div className="field">
-                <label className="label">Academy / Club</label>
-                <input className="input" placeholder="Academy / club name" />
+                <label className="label">Club / Organization</label>
+                <input className="input" placeholder="Club / organization name" />
               </div>
             )}
             <button type="submit" className="btn btn-primary">{saved ? '✓ Saved' : 'Save Changes'}</button>

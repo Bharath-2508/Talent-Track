@@ -27,7 +27,7 @@ export default function Scholarships() {
 
   const typeColor: Record<string, string> = {
     Government: 'pill-blue', Private: 'pill-purple',
-    Academy: 'pill-green', 'Sports Quota': 'pill-cyan',
+    Club: 'pill-green', 'Sports Quota': 'pill-cyan',
   }
 
   return (

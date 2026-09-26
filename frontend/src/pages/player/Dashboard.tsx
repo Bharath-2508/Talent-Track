@@ -196,7 +196,7 @@ export default function PlayerDashboard() {
         </Card>
 
         <Card pad>
-          <SectionHead title="My Recent Notifications" action={<Link to="/player/notifications" className="link small">View all</Link>} />
+          <SectionHead title="My Recent Notifications" />
           {notifications.length ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {notifications.slice(0, 4).map((n) => (

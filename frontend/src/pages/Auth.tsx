@@ -4,7 +4,7 @@ import { Zap, Mail, Lock, User, Calendar, MapPin, Target, BarChart3, Eye, EyeOff
 import { Card } from '../components/ui'
 import { cx } from '../components/ui'
 
-const API_BASE = 'http://localhost:8000/api'
+import { API_BASE } from '../lib/api'
 
 function AuthShell({ children, aside }: { children: ReactNode; aside: ReactNode }) {
   return (
@@ -100,7 +100,7 @@ export function PlayerLogin() {
       }
 
       localStorage.setItem('tt_user', JSON.stringify(data.user))
-      localStorage.setItem('tt_token', data.token)
+      localStorage.setItem('tt_token', data.user.token)
       navigate('/player/dashboard')
     } catch (err: any) {
       setError(err.message || 'Server connection error.')
@@ -164,7 +164,7 @@ export function PlayerLogin() {
       </form>
       <div className="divider">OR</div>
       <Link to="/coach/login" className="btn btn-outline btn-block btn-sm">
-        Login as Coach / Academy
+        Login as Coach
       </Link>
     </AuthShell>
   )
@@ -214,7 +214,7 @@ export function PlayerRegister() {
       }
 
       localStorage.setItem('tt_user', JSON.stringify(data.user))
-      localStorage.setItem('tt_token', data.token)
+      localStorage.setItem('tt_token', data.user.token)
       navigate('/player/dashboard')
     } catch (err: any) {
       setError(err.message || 'Server connection error.')
@@ -354,7 +354,6 @@ export function PlayerRegister() {
 export function CoachLogin() {
   const navigate = useNavigate()
   const [mode, setMode] = useState<'login' | 'register'>('login')
-  const [role, setRole] = useState<'Coach' | 'Academy'>('Coach')
   
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -373,7 +372,7 @@ export function CoachLogin() {
     const targetUrl = mode === 'register' ? `${API_BASE}/auth/register` : `${API_BASE}/auth/login`
     const bodyData = mode === 'register'
       ? {
-          role: role.toUpperCase(),
+          role: 'COACH',
           full_name: fullName,
           email,
           password,
@@ -381,7 +380,7 @@ export function CoachLogin() {
           primary_sport: primarySport,
         }
       : {
-          role: role.toUpperCase(),
+          role: 'COACH',
           email,
           password,
         }
@@ -399,7 +398,7 @@ export function CoachLogin() {
       }
 
       localStorage.setItem('tt_user', JSON.stringify(data.user))
-      localStorage.setItem('tt_token', data.token)
+      localStorage.setItem('tt_token', data.user.token)
       navigate('/coach/dashboard')
     } catch (err: any) {
       setError(err.message || 'Server connection error.')
@@ -419,18 +418,9 @@ export function CoachLogin() {
       <div className="flex" style={{ gap: 10, marginBottom: 6 }}>
         <span style={{ fontSize: 30 }}>🛡️</span>
         <div>
-          <div className="auth-title">{mode === 'login' ? 'Coach & Academy Login' : 'Register Coach / Academy'}</div>
+          <div className="auth-title">{mode === 'login' ? 'Coach Login' : 'Register Coach'}</div>
           <div className="auth-sub" style={{ marginBottom: 0 }}>Recruit your next star athlete</div>
         </div>
-      </div>
-
-      <div className="role-toggle mt-3">
-        <button type="button" className={cx('role-opt', role === 'Coach' && 'active')} onClick={() => setRole('Coach')}>
-          Coach
-        </button>
-        <button type="button" className={cx('role-opt', role === 'Academy' && 'active')} onClick={() => setRole('Academy')}>
-          Academy
-        </button>
       </div>
 
       {error && (
@@ -443,11 +433,11 @@ export function CoachLogin() {
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 18 }}>
         {mode === 'register' && (
           <div className="field">
-            <label className="label">{role === 'Coach' ? 'Full Name' : 'Academy Name'}</label>
+            <label className="label">Full Name</label>
             <div style={{ position: 'relative' }}>
               <input
                 className="input"
-                placeholder={role === 'Coach' ? 'Coach Ravi Kumar' : 'Velocity Sports Academy'}
+                placeholder="Coach Ravi Kumar"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -464,7 +454,7 @@ export function CoachLogin() {
             <input
               type="email"
               className="input"
-              placeholder="coach@academy.com"
+              placeholder="coach@example.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -500,7 +490,7 @@ export function CoachLogin() {
         )}
 
         <div className="flex between">
-          <span className="tiny dim">Signing in as: <b style={{ color: 'var(--text)' }}>{role}</b></span>
+          <span className="tiny dim">Signing in as: <b style={{ color: 'var(--text)' }}>Coach</b></span>
           <button
             type="button"
             className="link tiny"
@@ -511,7 +501,7 @@ export function CoachLogin() {
         </div>
 
         <button type="submit" className="btn btn-primary btn-block btn-lg" disabled={loading}>
-          {loading ? 'Processing...' : `${mode === 'login' ? 'Login' : 'Register'} as ${role}`} <ArrowRight size={17} />
+          {loading ? 'Processing...' : `${mode === 'login' ? 'Login' : 'Register'} as Coach`} <ArrowRight size={17} />
         </button>
       </form>
     </AuthShell>

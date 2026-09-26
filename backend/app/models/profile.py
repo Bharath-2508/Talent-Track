@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import typing
 from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import BaseModel, TimestampMixin
+
+if typing.TYPE_CHECKING:
+    from .user import User
+    from .sport import Sport
+    from .video import Video
 
 
 class AthleteProfile(BaseModel, TimestampMixin):
@@ -42,20 +48,5 @@ class CoachProfile(BaseModel, TimestampMixin):
     years_experience: Mapped[int | None] = mapped_column(Integer)
     location: Mapped[str | None] = mapped_column(String(160))
     bio: Mapped[str | None] = mapped_column(Text)
-
-    user: Mapped["User"] = relationship("User", lazy="joined")  # noqa: F821
-
-
-class Academy(BaseModel, TimestampMixin):
-    """Academy runs trials and manages applications."""
-    __tablename__ = "academies"
-
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False, index=True
-    )
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    location: Mapped[str | None] = mapped_column(String(160))
-    website: Mapped[str | None] = mapped_column(String(255))
-    description: Mapped[str | None] = mapped_column(Text)
 
     user: Mapped["User"] = relationship("User", lazy="joined")  # noqa: F821

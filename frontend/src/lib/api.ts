@@ -7,7 +7,7 @@
  *   await api.post('/player/upload', formData)
  */
 
-export const API_BASE = 'http://localhost:8000/api'
+export const API_BASE = 'http://127.0.0.1:8000/api'
 
 function getToken(): string | null {
   return localStorage.getItem('tt_token')

@@ -48,6 +48,23 @@ export type AthleteStats = {
   timeline: TimelineItem[]
   injury: Injury | null
   careerPotential: CareerLevel[]
+  comparison?: {
+    has_previous: boolean
+    message?: string
+    previous_score: number | null
+    current_score: number
+    score_difference: number
+    metrics_comparison: Array<{
+      metric: string
+      previous: number
+      current: number
+      difference: number
+      status: string
+    }>
+    improvements: string[]
+    areas_that_became_weaker: string[]
+    progress_summary: string
+  } | null
 }
 
 type AthleteCtx = {
@@ -75,7 +92,7 @@ const EMPTY_PROFILE: AthleteProfile = {
 const EMPTY_STATS: AthleteStats = {
   latestVideo: null, overall: 0, improvement: 0, metrics: [], strengths: [],
   weaknesses: [], recommendations: [], trainingPlan: [], badges: [],
-  growth: [], timeline: [], injury: null, careerPotential: [],
+  growth: [], timeline: [], injury: null, careerPotential: [], comparison: null,
 }
 
 const Ctx = createContext<AthleteCtx>({
@@ -166,6 +183,7 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
           timeline: an.timeline || [],
           injury: an.injury || null,
           careerPotential: an.career_potential || [],
+          comparison: an.comparison || null,
         })
         setProfile(prev => ({ ...prev, overallScore: an.overall_score }))
       }

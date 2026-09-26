@@ -139,9 +139,9 @@ export function Layout({
         </nav>
 
         <div className="side-user">
-          <Avatar index={portal === 'player' ? 1 : 3} size={40} name={athlete.name || (portal === 'player' ? 'Athlete' : 'Coach')} />
+          <Avatar index={portal === 'player' ? 1 : 3} size={40} name={athlete.name || JSON.parse(localStorage.getItem('tt_user') || '{}')?.full_name || (portal === 'player' ? 'Athlete' : 'Coach')} />
           <div className="side-user-info">
-            <div className="side-user-name">{athlete.name || (portal === 'player' ? 'Registered Athlete' : 'Registered Coach')}</div>
+            <div className="side-user-name">{athlete.name || JSON.parse(localStorage.getItem('tt_user') || '{}')?.full_name || (portal === 'player' ? 'Registered Athlete' : 'Registered Coach')}</div>
             <div className="side-user-role">{portal === 'player' ? 'Sprinter · Running / Sprinting' : 'Recruitment Scout'}</div>
           </div>
         </div>
@@ -162,11 +162,7 @@ export function Layout({
             <button className="icon-btn" title="Search">
               <Search />
             </button>
-            <Link to={`/${portal}/notifications`} className="icon-btn" title="Notifications">
-              <Bell />
-              {notifCount > 0 && <span className="notif-dot" />}
-            </Link>
-            <button className="icon-btn" title="Avatar" onClick={() => navigate(`/${portal}/settings`)}>
+            <button className="icon-btn" title="Profile" onClick={() => navigate(portal === 'player' ? '/player/portfolio' : '/coach/profile')}>
               <User />
             </button>
           </div>

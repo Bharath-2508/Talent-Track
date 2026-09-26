@@ -1,0 +1,72 @@
+{
+    "total_videos": 5,
+    "successfully_processed": 5,
+    "failed_videos": 0,
+    "videos": [
+        {
+            "filename": "Axl-10kmh - Trim_norm.MOV",
+            "path": "D:\\TalentTrack-AI\\assests\\Running Posture Analysis Dataset\\Axl-10kmh - Trim_norm.MOV",
+            "category": "uncategorized",
+            "status": "success",
+            "fps": 30.0,
+            "frame_count": 870,
+            "duration": 29.0,
+            "resolution": [
+                1080,
+                1920
+            ]
+        },
+        {
+            "filename": "Axl-12kmh - Trim_norm.MOV",
+            "path": "D:\\TalentTrack-AI\\assests\\Running Posture Analysis Dataset\\Axl-12kmh - Trim_norm.MOV",
+            "category": "uncategorized",
+            "status": "success",
+            "fps": 30.0,
+            "frame_count": 870,
+            "duration": 29.0,
+            "resolution": [
+                1080,
+                1920
+            ]
+        },
+        {
+            "filename": "Axl-8kmh - Trim_norm.MOV",
+            "path": "D:\\TalentTrack-AI\\assests\\Running Posture Analysis Dataset\\Axl-8kmh - Trim_norm.MOV",
+            "category": "uncategorized",
+            "status": "success",
+            "fps": 30.0,
+            "frame_count": 870,
+            "duration": 29.0,
+            "resolution": [
+                1080,
+                1920
+            ]
+        },
+        {
+            "filename": "IMG_5384 - 13km_h - Trim_norm.MOV",
+            "path": "D:\\TalentTrack-AI\\assests\\Running Posture Analysis Dataset\\IMG_5384 - 13km_h - Trim_norm.MOV",
+            "category": "uncategorized",
+            "status": "success",
+            "fps": 30.0,
+            "frame_count": 870,
+            "duration": 29.0,
+            "resolution": [
+                1056,
+                1888
+            ]
+        },
+        {
+            "filename": "IMG_5385 - 13km_h - Trim_norm.MOV",
+            "path": "D:\\TalentTrack-AI\\assests\\Running Posture Analysis Dataset\\IMG_5385 - 13km_h - Trim_norm.MOV",
+            "category": "uncategorized",
+            "status": "success",
+            "fps": 30.0,
+            "frame_count": 870,
+            "duration": 29.0,
+            "resolution": [
+                1056,
+                1888
+            ]
+        }
+    ]
+}

@@ -8,7 +8,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
-from passlib.context import CryptContext
+import bcrypt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
@@ -19,9 +19,6 @@ from ..models.profile import AthleteProfile, CoachProfile
 from .deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 # ── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -47,11 +44,15 @@ class LoginSchema(BaseModel):
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _hash(plain: str) -> str:
-    return pwd_ctx.hash(plain)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(plain.encode('utf-8'), salt).decode('utf-8')
 
 
 def _verify(plain: str, hashed: str) -> bool:
-    return pwd_ctx.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
+    except ValueError:
+        return False
 
 
 def _make_token(user_id: int) -> str:
@@ -115,7 +116,7 @@ def register(data: RegisterSchema, db: Session = Depends(get_db)):
             bio="",
         )
         db.add(profile)
-    elif role_name in ("COACH", "ACADEMY", "ADMIN"):
+    elif role_name in ("COACH", "ADMIN"):
         profile = CoachProfile(
             user_id=user.id,
             location=data.location or "",
@@ -160,8 +161,8 @@ def login(data: LoginSchema, db: Session = Depends(get_db)):
     if data.role:
         required = data.role.upper()
         if user.role.name != required:
-            # Allow coaches to also login via ACADEMY/ADMIN
-            if not (required == "COACH" and user.role.name in ("ACADEMY", "ADMIN")):
+            # Allow coaches to also login via ADMIN
+            if not (required == "COACH" and user.role.name == "ADMIN"):
                 raise HTTPException(
                     status_code=403,
                     detail=f"Account is registered as {user.role.name}, not {required}.",

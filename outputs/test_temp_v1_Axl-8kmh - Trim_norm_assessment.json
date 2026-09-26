@@ -1,0 +1,45 @@
+{
+    "video": "test_temp_v1_Axl-8kmh - Trim_norm.MOV",
+    "pose_detection_rate": 100.0,
+    "overall_score": 66,
+    "posture": {
+        "score": 15,
+        "max_score": 20,
+        "analysis": "Posture similarity is 77.4%. Good forward lean."
+    },
+    "arm_movement": {
+        "score": 9,
+        "max_score": 15,
+        "analysis": "Arm swing is too stiff or excessive."
+    },
+    "leg_movement": {
+        "score": 14,
+        "max_score": 20,
+        "analysis": "Knee lift is below optimal reference."
+    },
+    "body_alignment": {
+        "score": 11,
+        "max_score": 15,
+        "analysis": "Body alignment matches reference well."
+    },
+    "running_technique": {
+        "score": 14,
+        "max_score": 20,
+        "analysis": "Technique shows multiple deviations from reference."
+    },
+    "symmetry": {
+        "score": 3,
+        "max_score": 10,
+        "analysis": "Noticeable asymmetry between left and right side."
+    },
+    "movement_similarity": 71.08,
+    "strengths": [
+        "Strong posture (15/20)"
+    ],
+    "weaknesses": [
+        "Needs improvement in symmetry (3/10)"
+    ],
+    "recommendations": [
+        "Focus on drills improving symmetry."
+    ]
+}

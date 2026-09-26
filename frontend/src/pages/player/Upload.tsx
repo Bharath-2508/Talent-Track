@@ -12,7 +12,7 @@ type Stage = 'idle' | 'uploading' | 'processing' | 'done' | 'error'
 
 export default function UploadVideo() {
   const navigate = useNavigate()
-  const { sport, addVideo } = useAthlete()
+  const { sport, addVideo, refreshStats } = useAthlete()
   const meta = SPORT_META[sport]
   const [stage, setStage] = useState<Stage>('idle')
   const [progress, setProgress] = useState(0)
@@ -48,6 +48,7 @@ export default function UploadVideo() {
           const status = await api.get<{ status: string; error?: string }>(`/analyze/status/${vid}`)
           if (status.status === 'done') {
             clearInterval(pollInterval)
+            await refreshStats()
             setProgress(100)
             setStage('done')
           } else if (status.status === 'error') {

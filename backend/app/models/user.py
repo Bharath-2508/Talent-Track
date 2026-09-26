@@ -9,16 +9,14 @@ from .base import BaseModel, TimestampMixin
 
 
 class RoleName(str, Enum):
-    """The four roles supported by the platform.
+    """The roles supported by the platform.
 
     PLAYER  -> can only see their own data (no search, no recruitment)
-    COACH   -> recruiter/scout: search, compare, shortlist, invite
-    ACADEMY -> runs trials, manages applications
+    COACH   -> recruiter/scout: search, compare, shortlist, invite, run trials
     ADMIN   -> platform administration
     """
     PLAYER = "PLAYER"
     COACH = "COACH"
-    ACADEMY = "ACADEMY"
     ADMIN = "ADMIN"
 
 

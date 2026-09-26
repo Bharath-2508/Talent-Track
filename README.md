@@ -23,7 +23,7 @@ coming soon"** — the system never fabricates analysis.
 ### Player portal (`/player/*`)
 - Register, login, create profile, select primary sport
 - Upload practice videos with drag & drop and a step-by-step processing UI
-- Sport detection + sport-specific AI performance report (metrics, strengths, weaknesses)
+- Sport detection + sport-specific AI performance report (metrics, strengths, weaknesses) 
 - Injury risk estimate (clearly labelled as training-awareness, not medical diagnosis)
 - Growth timeline, own-video comparison, training plan
 - Sport-filtered learning recommendations + reference video library

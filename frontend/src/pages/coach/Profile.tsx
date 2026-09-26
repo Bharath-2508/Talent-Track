@@ -19,7 +19,7 @@ export default function CoachProfile() {
                 <h2 className="sec-title" style={{ fontSize: 24 }}>{COACH.name}</h2>
                 <div className="flex gap-2 mt-1 wrap">
                   <Pill color="pill-blue">🛡️ {COACH.role}</Pill>
-                  <Pill><Building2 size={12} /> {COACH.academy}</Pill>
+                  <Pill><Building2 size={12} /> {COACH.organization}</Pill>
                 </div>
                 <div className="flex gap-3 mt-3 wrap tiny muted">
                   <span className="flex gap-1"><Mail size={13} /> {COACH.email}</span>
@@ -69,14 +69,14 @@ export default function CoachProfile() {
             ))}
           </div>
           <div className="mt-3">
-            <Pill color="pill-amber"><Award size={12} /> Verified Academy Coach</Pill>
+            <Pill color="pill-amber"><Award size={12} /> Verified Club Coach</Pill>
           </div>
         </Card>
 
         <Card pad style={{ gridColumn: '1 / -1' }}>
           <SectionHead title="About" />
           <p className="muted small">
-            {COACH.name} is a talent identification specialist at {COACH.academy} with 9 years of experience scouting youth
+            {COACH.name} is a talent identification specialist at {COACH.organization} with 9 years of experience scouting youth
             running and sprinting. Leverages TalentTrack AI analytics to shortlist athletes based on objective AI performance
             scores rather than bias. Has helped 40+ athletes reach district and state level.
           </p>

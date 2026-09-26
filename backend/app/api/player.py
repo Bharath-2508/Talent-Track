@@ -25,7 +25,7 @@ from .deps import require_player
 
 router = APIRouter(prefix="/player", tags=["player"])
 
-UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "uploads"
+UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "temp_uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {".mp4", ".mov", ".webm", ".avi", ".mkv"}
@@ -172,6 +172,37 @@ async def upload_video(
 
 # ── Analysis ──────────────────────────────────────────────────────────────────
 
+@router.get("/analyses")
+def list_analyses(user: User = Depends(require_player), db: Session = Depends(get_db)):
+    athlete = _get_athlete(user, db)
+    analyses = (
+        db.query(Analysis)
+        .filter(Analysis.athlete_id == athlete.id)
+        .order_by(Analysis.id.desc())
+        .all()
+    )
+    return [
+        {
+            "id": an.id,
+            "video_id": an.video_id,
+            "overall_score": an.overall_score,
+            "posture_score": an.posture_score,
+            "arm_movement_score": an.arm_movement_score,
+            "leg_movement_score": an.leg_movement_score,
+            "body_alignment_score": an.body_alignment_score,
+            "running_technique_score": an.running_technique_score,
+            "symmetry_score": an.symmetry_score,
+            "movement_similarity": an.movement_similarity,
+            "metrics": _json_load(an.metrics_json),
+            "strengths": _json_load(an.strengths_json),
+            "weaknesses": _json_load(an.weaknesses_json),
+            "comparison": _json_load(an.comparison_json),
+            "created_at": an.created_at.isoformat() if an.created_at else "",
+        }
+        for an in analyses
+    ]
+
+
 @router.get("/analysis/latest")
 def latest_analysis(user: User = Depends(require_player), db: Session = Depends(get_db)):
     athlete = _get_athlete(user, db)
@@ -183,10 +214,19 @@ def latest_analysis(user: User = Depends(require_player), db: Session = Depends(
         "id": an.id,
         "video_id": an.video_id,
         "overall_score": an.overall_score,
+        "posture_score": an.posture_score,
+        "arm_movement_score": an.arm_movement_score,
+        "leg_movement_score": an.leg_movement_score,
+        "body_alignment_score": an.body_alignment_score,
+        "running_technique_score": an.running_technique_score,
+        "symmetry_score": an.symmetry_score,
+        "movement_similarity": an.movement_similarity,
         "metrics": _json_load(an.metrics_json),
         "strengths": _json_load(an.strengths_json),
         "weaknesses": _json_load(an.weaknesses_json),
         "recommendations": _json_load(an.recommendations_json),
+        "comparison": _json_load(an.comparison_json),
+        "analysis_metadata": _json_load(an.analysis_metadata_json),
         "training_plan": _json_load(an.training_plan_json),
         "badges": _json_load(an.badges_json),
         "growth": _json_load(an.growth_json),
@@ -211,10 +251,19 @@ def get_analysis(
         "id": an.id,
         "video_id": an.video_id,
         "overall_score": an.overall_score,
+        "posture_score": an.posture_score,
+        "arm_movement_score": an.arm_movement_score,
+        "leg_movement_score": an.leg_movement_score,
+        "body_alignment_score": an.body_alignment_score,
+        "running_technique_score": an.running_technique_score,
+        "symmetry_score": an.symmetry_score,
+        "movement_similarity": an.movement_similarity,
         "metrics": _json_load(an.metrics_json),
         "strengths": _json_load(an.strengths_json),
         "weaknesses": _json_load(an.weaknesses_json),
         "recommendations": _json_load(an.recommendations_json),
+        "comparison": _json_load(an.comparison_json),
+        "analysis_metadata": _json_load(an.analysis_metadata_json),
         "training_plan": _json_load(an.training_plan_json),
         "badges": _json_load(an.badges_json),
         "growth": _json_load(an.growth_json),

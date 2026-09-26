@@ -1,0 +1,48 @@
+{
+    "video": "Axl-10kmh - Trim_norm.MOV",
+    "pose_detection_rate": 99.66,
+    "overall_score": 68,
+    "posture": {
+        "score": 19,
+        "max_score": 20,
+        "analysis": "Posture similarity is 97.0%. Good forward lean."
+    },
+    "arm_movement": {
+        "score": 10,
+        "max_score": 15,
+        "analysis": "Efficient arm swing."
+    },
+    "leg_movement": {
+        "score": 9,
+        "max_score": 20,
+        "analysis": "Knee lift is below optimal reference."
+    },
+    "body_alignment": {
+        "score": 14,
+        "max_score": 15,
+        "analysis": "Body alignment matches reference well."
+    },
+    "running_technique": {
+        "score": 14,
+        "max_score": 20,
+        "analysis": "Technique shows multiple deviations from reference."
+    },
+    "symmetry": {
+        "score": 2,
+        "max_score": 10,
+        "analysis": "Noticeable asymmetry between left and right side."
+    },
+    "movement_similarity": 72.25,
+    "strengths": [
+        "Strong posture (19/20)",
+        "Strong body alignment (14/15)"
+    ],
+    "weaknesses": [
+        "Needs improvement in leg movement (9/20)",
+        "Needs improvement in symmetry (2/10)"
+    ],
+    "recommendations": [
+        "Focus on drills improving leg movement.",
+        "Focus on drills improving symmetry."
+    ]
+}

@@ -27,9 +27,9 @@ export type LearnVideo = {
 export const LEARNING_VIDEOS: LearnVideo[] = [
   { id: 1, sport: 'running', title: 'Sprinting Front-Side Mechanics', skill: 'Technique', difficulty: 'Advanced', duration: '12:40', why: 'Covers rail-to-front-side mechanics for stride and knee drive.', emoji: '🏃', gradient: 'linear-gradient(135deg,#1e3a8a,#7c3aed)', coach: 'World Athletics' },
   { id: 2, sport: 'running', title: 'Arm Drive & Posture Masterclass', skill: 'Posture', difficulty: 'Intermediate', duration: '08:15', why: 'Improves arm swing and torso posture for a stable sprint.', emoji: '💪', gradient: 'linear-gradient(135deg,#0e7490,#3d8bff)', coach: 'USATF Coaches' },
-  { id: 3, sport: 'running', title: 'Explosive Sprint Start', skill: 'Start', difficulty: 'Advanced', duration: '15:22', why: 'Builds block technique and 0-30m acceleration.', emoji: '⚡', gradient: 'linear-gradient(135deg,#4f46e5,#a855f7)', coach: 'Bolt Academy' },
+  { id: 3, sport: 'running', title: 'Explosive Sprint Start', skill: 'Start', difficulty: 'Advanced', duration: '15:22', why: 'Builds block technique and 0-30m acceleration.', emoji: '⚡', gradient: 'linear-gradient(135deg,#4f46e5,#a855f7)', coach: 'Bolt Club' },
   { id: 4, sport: 'running', title: 'Cadence & Stride Length Drills', skill: 'Cadence', difficulty: 'Beginner', duration: '06:50', why: 'Increases step rate and optimal stride length.', emoji: '🏃', gradient: 'linear-gradient(135deg,#059669,#22d3ee)', coach: 'TalentTrack AI' },
-  { id: 5, sport: 'running', title: 'Knee Drive & Leg Recovery', skill: 'Leg / Knee', difficulty: 'Intermediate', duration: '11:30', why: 'Strengthens knee drive for longer, safer strides.', emoji: '🦵', gradient: 'linear-gradient(135deg,#065f46,#34d399)', coach: 'Pro Sprint Academy' },
+  { id: 5, sport: 'running', title: 'Knee Drive & Leg Recovery', skill: 'Leg / Knee', difficulty: 'Intermediate', duration: '11:30', why: 'Strengthens knee drive for longer, safer strides.', emoji: '🦵', gradient: 'linear-gradient(135deg,#065f46,#34d399)', coach: 'Pro Sprint Club' },
   { id: 6, sport: 'running', title: 'Movement Symmetry & Form Correction', skill: 'Symmetry', difficulty: 'Intermediate', duration: '10:05', why: 'Improves left-right balance and reduces overstriding.', emoji: '⚖️', gradient: 'linear-gradient(135deg,#b45309,#f59e0b)', coach: 'Biomechanics Lab' },
 ]
 
@@ -49,7 +49,7 @@ export type Scholarship = {
 export const SCHOLARSHIPS: Scholarship[] = [
   { id: 1, sport: 'running', name: 'State Athletics Excellence Scholarship', org: 'Sports Authority of India', type: 'Government', amount: '₹50,000 / year', eligibility: 'U-19, District level or above', deadline: 'Aug 30, 2026' },
   { id: 2, sport: 'running', name: 'AFI Sprint Talent Fund', org: 'Athletics Federation of India', type: 'Private', amount: '₹1,20,000 / year', eligibility: 'Top 10% AI score in State', deadline: 'Sep 15, 2026' },
-  { id: 3, sport: 'running', name: 'Academy Scholarship – Sprinters', org: 'National Sprint Academy', type: 'Academy', amount: 'Full fee waiver', eligibility: 'AI technique score above 85', deadline: 'Oct 01, 2026' },
+  { id: 3, sport: 'running', name: 'Club Scholarship – Sprinters', org: 'National Sprint Club', type: 'Club', amount: 'Full fee waiver', eligibility: 'AI technique score above 85', deadline: 'Oct 01, 2026' },
   { id: 4, sport: 'running', name: 'University Sports Quota', org: 'Anna University', type: 'Sports Quota', amount: 'Admission quota + stipend', eligibility: 'State-level participation', deadline: 'Nov 10, 2026' },
   { id: 5, sport: 'running', name: 'Run India Athlete Fund', org: 'Run India / AFI', type: 'Government', amount: '₹75,000 / year', eligibility: 'Under 20, sprint events', deadline: 'Sep 28, 2026' },
 ]
@@ -118,7 +118,7 @@ export type Application = {
 export type Coach = {
   name: string
   role: string
-  academy: string
+  organization: string
   email: string
   phone: string
   region: string
@@ -198,7 +198,7 @@ export type TrainingPlanDay = {
 /** Empty/neutral exports - pages render empty states when no data */
 export const PLAYERS: Player[] = []
 export const APPLICATIONS: Application[] = []
-export const COACH: Coach = { name: '', role: '', academy: '', email: '', phone: '', region: '', stats: [] }
+export const COACH: Coach = { name: '', role: '', organization: '', email: '', phone: '', region: '', stats: [] }
 export const ANALYTICS: Analytics = { successRate: 0, playersTracked: 0, trialsHosted: 0, avgMatch: 0, distribution: [], funnel: [], sportWise: [], monthly: [] }
 export const COACH_NOTIFICATIONS: CoachNotification[] = []
 export const SPORT_METRICS: SportMetrics = { running: [] }

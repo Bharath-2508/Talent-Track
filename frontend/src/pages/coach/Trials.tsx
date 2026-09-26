@@ -58,7 +58,7 @@ export default function CoachTrials() {
   return (
     <Layout nav={COACH_NAV} title="Trials" crumb="Trials" portal="coach" notifCount={0}>
       <SectionHead
-        title="Academy Trials"
+        title="Club Trials"
         sub="Create and manage trials for running / sprinting athletes"
         action={
           <button className="btn btn-primary btn-sm" onClick={() => setShowForm(!showForm)}>
@@ -84,7 +84,7 @@ export default function CoachTrials() {
               </div>
               <div className="field">
                 <label className="label">Organisation</label>
-                <input className="input" placeholder="Your academy / club name" value={form.org} onChange={e => setForm(f => ({ ...f, org: e.target.value }))} />
+                <input className="input" placeholder="Your club / organization name" value={form.org} onChange={e => setForm(f => ({ ...f, org: e.target.value }))} />
               </div>
             </div>
             <div className="field-row">

@@ -57,6 +57,6 @@ def require_player(user: User = Depends(get_current_user)) -> User:
 
 
 def require_coach(user: User = Depends(get_current_user)) -> User:
-    if user.role.name not in ("COACH", "ACADEMY", "ADMIN"):
+    if user.role.name not in ("COACH", "ADMIN"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Coach access required.")
     return user

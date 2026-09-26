@@ -88,7 +88,7 @@ export default function Recommendations() {
             <div className="stat-icon"><Cpu /></div>
             <div>
               <div style={{ fontWeight: 700 }}>Want more precision?</div>
-              <div className="tiny dim">Add filters like agility score, goal contribution or academy background</div>
+              <div className="tiny dim">Add filters like agility score, goal contribution or club background</div>
             </div>
           </div>
           <Link to="/coach/search" className="btn btn-outline btn-sm">Open Talent Search</Link>

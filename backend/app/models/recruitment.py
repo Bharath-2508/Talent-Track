@@ -1,10 +1,16 @@
 """Recruitment models — shortlists and invitations."""
 from __future__ import annotations
 
+import typing
 from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import BaseModel, TimestampMixin
+
+if typing.TYPE_CHECKING:
+    from .user import User
+    from .profile import AthleteProfile
+    from .trial import Trial
 
 
 class Shortlist(BaseModel, TimestampMixin):

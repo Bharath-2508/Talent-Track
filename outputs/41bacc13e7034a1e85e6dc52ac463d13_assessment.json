@@ -1,0 +1,52 @@
+{
+    "video": "41bacc13e7034a1e85e6dc52ac463d13.mp4",
+    "pose_detection_rate": 52.08,
+    "overall_score": 40,
+    "posture": {
+        "score": 19,
+        "max_score": 20,
+        "analysis": "Posture similarity is 97.2%. Good forward lean."
+    },
+    "arm_movement": {
+        "score": 0,
+        "max_score": 15,
+        "analysis": "Arm swing is too stiff or excessive."
+    },
+    "leg_movement": {
+        "score": 0,
+        "max_score": 20,
+        "analysis": "Knee lift is below optimal reference."
+    },
+    "body_alignment": {
+        "score": 14,
+        "max_score": 15,
+        "analysis": "Body alignment matches reference well."
+    },
+    "running_technique": {
+        "score": 6,
+        "max_score": 20,
+        "analysis": "Technique shows multiple deviations from reference."
+    },
+    "symmetry": {
+        "score": 1,
+        "max_score": 10,
+        "analysis": "Noticeable asymmetry between left and right side."
+    },
+    "movement_similarity": 32.4,
+    "strengths": [
+        "Strong posture (19/20)",
+        "Strong body alignment (14/15)"
+    ],
+    "weaknesses": [
+        "Needs improvement in arm movement (0/15)",
+        "Needs improvement in leg movement (0/20)",
+        "Needs improvement in running technique (6/20)",
+        "Needs improvement in symmetry (1/10)"
+    ],
+    "recommendations": [
+        "Focus on drills improving arm movement.",
+        "Focus on drills improving leg movement.",
+        "Focus on drills improving running technique.",
+        "Focus on drills improving symmetry."
+    ]
+}

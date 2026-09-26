@@ -39,7 +39,7 @@ import Settings from './pages/Settings'
 export default function App() {
   return (
     <AthleteProvider>
-      <HashRouter>
+      <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<Landing />} />
 

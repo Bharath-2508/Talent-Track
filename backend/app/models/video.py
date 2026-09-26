@@ -1,10 +1,14 @@
 """Video upload model."""
 from __future__ import annotations
 
+import typing
 from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import BaseModel, TimestampMixin
+
+if typing.TYPE_CHECKING:
+    from .profile import AthleteProfile
 
 
 class Video(BaseModel, TimestampMixin):

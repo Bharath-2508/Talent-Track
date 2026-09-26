@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Check, AlertTriangle, ArrowRight, Download, Sparkles, LineChart, Upload } from 'lucide-react'
+import { Check, AlertTriangle, ArrowRight, Download, Sparkles, LineChart, Upload, GitCompare } from 'lucide-react'
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer } from 'recharts'
 import { Layout } from '../../components/Layout'
 import { PLAYER_NAV } from '../nav'
@@ -70,6 +70,87 @@ export default function PerformanceReport() {
                 </div>
               )}
             </div>
+          </Card>
+
+          {/* ── Previous Assessment Comparison Section ── */}
+          <Card pad style={{ marginBottom: 18 }}>
+            <SectionHead
+              title="Previous Assessment Comparison"
+              sub="Comparing your current AI assessment against your previous saved report"
+              action={
+                stats.comparison?.has_previous ? (
+                  <Pill color={stats.comparison.score_difference >= 0 ? 'pill-green' : 'pill-red'}>
+                    Overall: {stats.comparison.score_difference >= 0 ? '+' : ''}{stats.comparison.score_difference} pts
+                  </Pill>
+                ) : (
+                  <Pill color="pill-blue">First Assessment</Pill>
+                )
+              }
+            />
+
+            {!stats.comparison || !stats.comparison.has_previous ? (
+              <div className="card card-pad" style={{ background: 'rgba(59,130,246,0.06)', borderColor: 'rgba(59,130,246,0.2)' }}>
+                <div className="flex gap-2">
+                  <GitCompare size={20} color="#3b82f6" />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 14 }}>First Running Assessment</div>
+                    <div className="tiny dim">This is your first running assessment. Previous comparison is not available yet. Upload your next video to track improvement over time!</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="grid grid-3 mb-3 gap-3">
+                  <div className="card card-pad" style={{ background: 'rgba(255,255,255,0.03)', textAlign: 'center' }}>
+                    <div className="tiny dim">Previous Score</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: '#9aa8bd' }}>{stats.comparison.previous_score} / 100</div>
+                  </div>
+                  <div className="card card-pad" style={{ background: 'rgba(139,92,246,0.08)', borderColor: '#8b5cf6', textAlign: 'center' }}>
+                    <div className="tiny dim">Current Score</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: '#a78bfa' }}>{stats.comparison.current_score} / 100</div>
+                  </div>
+                  <div className="card card-pad" style={{ background: stats.comparison.score_difference >= 0 ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)', borderColor: stats.comparison.score_difference >= 0 ? '#22c55e' : '#ef4444', textAlign: 'center' }}>
+                    <div className="tiny dim">Score Difference</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: stats.comparison.score_difference >= 0 ? '#4ade80' : '#f87171' }}>
+                      {stats.comparison.score_difference >= 0 ? `+${stats.comparison.score_difference}` : stats.comparison.score_difference} pts
+                    </div>
+                  </div>
+                </div>
+
+                <div className="cmp-table mb-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 12, padding: 12 }}>
+                  <div className="cmp-metric" style={{ fontWeight: 700, color: 'var(--text-muted)', fontSize: 12, borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 6, marginBottom: 8 }}>
+                    <span>Metric</span>
+                    <span>Previous</span>
+                    <span>Current</span>
+                    <span style={{ textAlign: 'right' }}>Difference</span>
+                  </div>
+                  {stats.comparison.metrics_comparison?.map((m) => (
+                    <div key={m.metric} className="cmp-metric" style={{ padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                      <span className="m-label" style={{ fontWeight: 600 }}>{m.metric}</span>
+                      <span className="cmp-val prev" style={{ color: '#9aa8bd' }}>{m.previous}/100</span>
+                      <span className="cmp-val cur" style={{ fontWeight: 700 }}>{m.current}/100</span>
+                      <span style={{ textAlign: 'right', fontWeight: 700, color: m.difference > 0 ? '#4ade80' : m.difference < 0 ? '#f87171' : '#9aa8bd' }}>
+                        {m.difference > 0 ? `+${m.difference}` : m.difference}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 wrap mb-3">
+                  {stats.comparison.improvements?.map((imp) => (
+                    <Pill key={imp} color="pill-green">✓ Improved: {imp}</Pill>
+                  ))}
+                  {stats.comparison.areas_that_became_weaker?.map((weak) => (
+                    <Pill key={weak} color="pill-red">⚠ Area to work on: {weak}</Pill>
+                  ))}
+                </div>
+
+                <div className="ai-insight" style={{ background: 'rgba(139,92,246,0.1)', borderColor: 'rgba(139,92,246,0.25)', borderRadius: 12, padding: 12 }}>
+                  <Sparkles size={18} color="#a78bfa" style={{ flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: '#e2e8f0' }}>{stats.comparison.progress_summary}</span>
+                </div>
+              </div>
+            )}
           </Card>
 
           <SectionHead title={`${meta.label} Performance Metrics`} sub="Running / Sprinting metrics scored by the AI" />

@@ -14,7 +14,7 @@ const RANGES = [
 ]
 
 export default function TalentSearch() {
-  const [sport, setSport] = useState<Sport | 'all'>('all')
+
   const [age, setAge] = useState('all')
   const [gender, setGender] = useState('all')
   const [position, setPosition] = useState('all')
@@ -23,7 +23,7 @@ export default function TalentSearch() {
   const [query, setQuery] = useState('')
 
   let list = PLAYERS
-  if (sport !== 'all') list = list.filter((p) => p.sport === sport)
+
   if (gender !== 'all') list = list.filter((p) => p.gender.toLowerCase() === gender.toLowerCase())
   if (position !== 'all') list = list.filter((p) => p.position === position)
   if (experience !== 'all') list = list.filter((p) => p.experience === experience)
@@ -34,7 +34,7 @@ export default function TalentSearch() {
   if (location) list = list.filter((p) => p.location.toLowerCase().includes(location.toLowerCase()))
   if (query) list = list.filter((p) => p.name.toLowerCase().includes(query.toLowerCase()) || p.skills.some((s) => s.toLowerCase().includes(query.toLowerCase())))
 
-  const positions = sport !== 'all' ? [...new Set(PLAYERS.filter((p) => p.sport === sport).map((p) => p.position))] : [...new Set(PLAYERS.map((p) => p.position))]
+  const positions = [...new Set(PLAYERS.map((p) => p.position))]
 
   return (
     <Layout nav={COACH_NAV} title="Search Players" crumb="Search Players" portal="coach" notifCount={3}>
@@ -58,15 +58,7 @@ export default function TalentSearch() {
           <button className="btn btn-ghost">Reset</button>
         </div>
         <div className="filter-grid">
-          <div className="field">
-            <label className="label">Sport</label>
-            <select className="select" value={sport} onChange={(e) => setSport(e.target.value as Sport | 'all')}>
-              <option value="all">Running / Sprinting</option>
-              {SPORTS.map((s) => (
-                <option key={s} value={s}>{SPORT_META[s].icon} {SPORT_META[s].label}</option>
-              ))}
-            </select>
-          </div>
+
           <div className="field">
             <label className="label">Age Group</label>
             <select className="select" value={age} onChange={(e) => setAge(e.target.value)}>

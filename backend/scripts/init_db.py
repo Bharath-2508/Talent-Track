@@ -71,9 +71,10 @@ def seed_trials(db: Session) -> None:
 
 
 def main() -> None:
-    print("Creating tables...")
+    print("Recreating database tables with updated schema...")
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    print("Tables created (or already present).")
+    print("Tables created.")
 
     db: Session = SessionLocal()
     try:
