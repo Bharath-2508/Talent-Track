@@ -62,16 +62,22 @@ class PoseEstimator:
         detected = False
         
         if results.pose_landmarks and len(results.pose_landmarks) > 0:
-            detected = True
             landmarks = results.pose_landmarks[0]
-            for name, lm_id in self.key_landmarks.items():
-                lm = landmarks[lm_id]
-                extracted_landmarks[name] = {
-                    "x": lm.x,
-                    "y": lm.y,
-                    "z": lm.z,
-                    "visibility": lm.visibility
-                }
+            # Key running landmarks: shoulders (11,12), hips (23,24), knees (25,26), ankles (27,28)
+            key_ids = [11, 12, 23, 24, 25, 26, 27, 28]
+            visibilities = [landmarks[idx].visibility for idx in key_ids if hasattr(landmarks[idx], 'visibility')]
+            avg_vis = sum(visibilities) / len(visibilities) if visibilities else 1.0
+
+            if avg_vis >= 0.5:
+                detected = True
+                for name, lm_id in self.key_landmarks.items():
+                    lm = landmarks[lm_id]
+                    extracted_landmarks[name] = {
+                        "x": lm.x,
+                        "y": lm.y,
+                        "z": lm.z,
+                        "visibility": getattr(lm, 'visibility', 1.0)
+                    }
                 
         return {
             "detected": detected,

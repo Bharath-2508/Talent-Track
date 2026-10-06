@@ -14,8 +14,8 @@ class DatasetBuilder:
         self.feature_extractor = FeatureExtractor()
         self.sample_rate = sample_rate
 
-    def build(self, output_path: str = "data/features/running_features.csv"):
-        videos = self.loader.scan_dataset()
+    def build(self, output_path: str = "data/features/running_features.csv", limit: int | None = 5):
+        videos = self.loader.scan_dataset(limit=limit)
         if not videos:
             print("No videos found to process.")
             return

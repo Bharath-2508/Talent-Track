@@ -37,7 +37,7 @@ def run_full_pipeline():
     pipeline = InferencePipeline()
     # Pick the first video to test inference
     test_video = df.iloc[0]['video_filename']
-    video_path = os.path.join("assests", "Running Posture Analysis Dataset", test_video)
+    video_path = os.path.join("assets", "Running Posture Analysis Dataset", test_video)
     
     if os.path.exists(video_path):
         result = pipeline.analyze_video(video_path)

@@ -1,26 +1,26 @@
 {
-    "video": "Axl-10kmh - Trim_norm.MOV",
+    "video": "test_sample.mov",
     "pose_detection_rate": 99.66,
-    "overall_score": 62,
+    "overall_score": 60,
     "posture": {
-        "score": 15,
+        "score": 11,
         "max_score": 20,
-        "analysis": "Posture similarity is 76.7%. Good forward lean."
+        "analysis": "Body lean is outside optimal range."
     },
     "arm_movement": {
-        "score": 7,
+        "score": 11,
         "max_score": 15,
-        "analysis": "Arm swing is too stiff or excessive."
+        "analysis": "Efficient arm swing."
     },
     "leg_movement": {
-        "score": 14,
+        "score": 13,
         "max_score": 20,
         "analysis": "Knee lift is below optimal reference."
     },
     "body_alignment": {
-        "score": 11,
+        "score": 8,
         "max_score": 15,
-        "analysis": "Body alignment matches reference well."
+        "analysis": "Potential overstriding or poor alignment."
     },
     "running_technique": {
         "score": 13,
@@ -28,20 +28,18 @@
         "analysis": "Technique shows multiple deviations from reference."
     },
     "symmetry": {
-        "score": 2,
+        "score": 4,
         "max_score": 10,
         "analysis": "Noticeable asymmetry between left and right side."
     },
-    "movement_similarity": 65.98,
+    "movement_similarity": 68.65,
     "strengths": [
-        "Strong posture (15/20)"
+        "Found foundational movement patterns, but overall form requires development."
     ],
     "weaknesses": [
-        "Needs improvement in arm movement (7/15)",
-        "Needs improvement in symmetry (2/10)"
+        "Needs improvement in symmetry (4/10)"
     ],
     "recommendations": [
-        "Focus on drills improving arm movement.",
         "Focus on drills improving symmetry."
     ]
 }

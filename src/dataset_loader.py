@@ -7,7 +7,7 @@ class DatasetLoader:
         self.dataset_path = Path(dataset_path)
         self.supported_extensions = {".mp4", ".avi", ".mov", ".mkv"}
 
-    def scan_dataset(self) -> List[Dict[str, str]]:
+    def scan_dataset(self, limit: int | None = None) -> List[Dict[str, str]]:
         """
         Recursively scans the dataset directory for supported video files.
         Returns a list of dictionaries containing video paths and categories (if any).
@@ -30,8 +30,11 @@ class DatasetLoader:
                     "relative_path": str(rel_path)
                 })
                 
-        print(f"Found {len(videos)} supported video files in {self.dataset_path}, using only first 3 for quick setup.")
-        return videos[:3]
+        if limit is not None:
+            print(f"Found {len(videos)} supported video files in {self.dataset_path}, returning first {limit}.")
+            return videos[:limit]
+        print(f"Found {len(videos)} supported video files in {self.dataset_path}.")
+        return videos
 
 if __name__ == "__main__":
     loader = DatasetLoader()

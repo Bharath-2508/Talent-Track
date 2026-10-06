@@ -2,7 +2,7 @@
     "model_type": "IsolationForest",
     "has_labels": false,
     "metrics": {
-        "val_normal_ratio": 0.6666666666666666
+        "val_normal_ratio": 1.0
     },
     "training_samples": 3,
     "features_used": 69

@@ -1,14 +1,14 @@
 {
-    "video": "Axl-10kmh - Trim_norm.MOV",
-    "pose_detection_rate": 99.66,
-    "overall_score": 62,
+    "video": "e3152b63602b495cbb45500aaaf81fa3.mov",
+    "pose_detection_rate": 100.0,
+    "overall_score": 66,
     "posture": {
         "score": 15,
         "max_score": 20,
-        "analysis": "Posture similarity is 76.7%. Good forward lean."
+        "analysis": "Posture similarity is 77.4%. Good forward lean."
     },
     "arm_movement": {
-        "score": 7,
+        "score": 9,
         "max_score": 15,
         "analysis": "Arm swing is too stiff or excessive."
     },
@@ -23,25 +23,23 @@
         "analysis": "Body alignment matches reference well."
     },
     "running_technique": {
-        "score": 13,
+        "score": 14,
         "max_score": 20,
         "analysis": "Technique shows multiple deviations from reference."
     },
     "symmetry": {
-        "score": 2,
+        "score": 3,
         "max_score": 10,
         "analysis": "Noticeable asymmetry between left and right side."
     },
-    "movement_similarity": 65.98,
+    "movement_similarity": 71.08,
     "strengths": [
         "Strong posture (15/20)"
     ],
     "weaknesses": [
-        "Needs improvement in arm movement (7/15)",
-        "Needs improvement in symmetry (2/10)"
+        "Needs improvement in symmetry (3/10)"
     ],
     "recommendations": [
-        "Focus on drills improving arm movement.",
         "Focus on drills improving symmetry."
     ]
 }
