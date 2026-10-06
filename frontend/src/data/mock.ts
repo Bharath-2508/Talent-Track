@@ -103,6 +103,7 @@ export type Player = {
   technique?: number
   trend?: number[]
   skills?: string[]
+  shortlisted?: boolean
 }
 
 export type Application = {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Share2, Download, MapPin, Target, FileText, Film, TrendingUp, Award, Upload } from 'lucide-react'
+import { Share2, Download, MapPin, Target, FileText, Film, TrendingUp, Award, Upload, LogOut } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { PLAYER_NAV } from '../nav'
 import { Card, SectionHead, Pill, Ring, Avatar } from '../../components/ui'
@@ -50,7 +50,7 @@ export default function Portfolio() {
                   <LineChart data={stats.growth}>
                     <XAxis dataKey="month" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
                     <YAxis hide domain={[60, 100]} />
-                    <Tooltip contentStyle={{ background: '#0e1526', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} />
+                    <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 10px 25px -5px rgba(15,23,42,0.1)', color: '#0f172a' }} />
                     <Line type="monotone" dataKey="score" stroke="#8b5cf6" strokeWidth={3} dot={{ fill: '#8b5cf6', r: 4 }} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -153,6 +153,7 @@ export default function Portfolio() {
             <Link to="/player/report" className="btn btn-primary btn-sm"><FileText size={14} /> AI Reports</Link>
             <Link to="/player/timeline" className="btn btn-outline btn-sm"><TrendingUp size={14} /> Progress</Link>
             <button className="btn btn-outline btn-sm"><Film size={14} /> Certificates</button>
+            <Link to="/" className="btn btn-outline btn-sm"><LogOut size={14} /> Logout</Link>
           </div>
         </Card>
       </div>

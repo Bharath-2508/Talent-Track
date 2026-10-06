@@ -67,6 +67,8 @@ export type AthleteStats = {
   } | null
 }
 
+import type { RealPlayerInvitation } from '../components/CelebrationPopupModal'
+
 type AthleteCtx = {
   sport: Sport
   setSport: (s: Sport) => void
@@ -75,6 +77,7 @@ type AthleteCtx = {
   stats: AthleteStats
   videos: VideoRec[]
   notifications: AthleteNotif[]
+  pendingInvitations: RealPlayerInvitation[]
   unreadNotifications: number
   addVideo: (name: string, size: string) => VideoRec | null
   addAssessment: (assessment: Assessment) => void
@@ -98,7 +101,7 @@ const EMPTY_STATS: AthleteStats = {
 const Ctx = createContext<AthleteCtx>({
   sport: 'running', setSport: () => {}, athlete: EMPTY_PROFILE,
   data: emptyAthleteData(), stats: EMPTY_STATS, videos: [], notifications: [],
-  unreadNotifications: 0, addVideo: () => null, addAssessment: () => {},
+  pendingInvitations: [], unreadNotifications: 0, addVideo: () => null, addAssessment: () => {},
   saveData: () => {}, markAllRead: () => {}, logout: () => {}, refreshStats: async () => {},
 })
 
@@ -136,56 +139,81 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
   const [stats, setStats] = useState<AthleteStats>(EMPTY_STATS)
   const [videos, setVideos] = useState<VideoRec[]>([])
   const [notifications, setNotifications] = useState<AthleteNotif[]>([])
+  const [pendingInvitations, setPendingInvitations] = useState<RealPlayerInvitation[]>([])
   const [data] = useState<AthleteData>(emptyAthleteData())
 
   const fetchStats = useCallback(async () => {
-    if (!isLoggedIn || storedUser?.role !== 'PLAYER') return
+    const currentUser = readStoredUser()
+    const token = localStorage.getItem('tt_token')
+    if (!token || !currentUser || currentUser.role !== 'PLAYER') {
+      setProfile(EMPTY_PROFILE)
+      setStats(EMPTY_STATS)
+      setVideos([])
+      setNotifications([])
+      setPendingInvitations([])
+      return
+    }
+
     try {
-      const [profileRes, latestRes, growthRes, notifsRes, videosRes] = await Promise.allSettled([
+      const [profileRes, latestRes, growthRes, notifsRes, videosRes, invsRes] = await Promise.allSettled([
         api.get<any>('/player/profile'),
         api.get<any>('/player/analysis/latest'),
         api.get<GrowthPoint[]>('/player/growth'),
         api.get<any[]>('/player/notifications'),
         api.get<any[]>('/player/videos'),
+        api.get<RealPlayerInvitation[]>('/player/invitations'),
       ])
 
       // Profile
       if (profileRes.status === 'fulfilled') {
         const p = profileRes.value
-        setProfile(prev => ({
-          ...prev,
-          name: p.full_name || prev.name,
-          email: p.email || prev.email,
-          gender: p.gender || prev.gender,
-          location: p.location || prev.location,
-          position: p.position || prev.position,
-          age: p.age,
+        setProfile({
+          id: String(p.id),
+          name: p.full_name || '',
+          email: p.email || '',
+          dob: '',
+          gender: p.gender || '',
+          location: p.location || '',
+          sport: 'running',
+          position: p.position || '',
+          experience: p.experience_years ? `${p.experience_years} yrs` : '',
+          level: 'State Athlete',
           overallScore: p.overall_score || 0,
-        }))
+          improvement: 0,
+          age: p.age,
+        })
       }
 
       // Analysis
-      if (latestRes.status === 'fulfilled' && latestRes.value?.has_analysis) {
-        const an = latestRes.value
-        const growth = growthRes.status === 'fulfilled' ? growthRes.value : []
-        const prevScore = growth.length > 1 ? growth[growth.length - 2]?.score ?? 0 : 0
-        setStats({
-          latestVideo: null,
-          overall: an.overall_score,
-          improvement: Math.max(0, an.overall_score - prevScore),
-          metrics: an.metrics || [],
-          strengths: an.strengths || [],
-          weaknesses: an.weaknesses || [],
-          recommendations: an.recommendations || [],
-          trainingPlan: an.training_plan || [],
-          badges: an.badges || [],
-          growth: growth,
-          timeline: an.timeline || [],
-          injury: an.injury || null,
-          careerPotential: an.career_potential || [],
-          comparison: an.comparison || null,
-        })
-        setProfile(prev => ({ ...prev, overallScore: an.overall_score }))
+      if (latestRes.status === 'fulfilled') {
+        if (latestRes.value?.has_analysis) {
+          const an = latestRes.value
+          const growth = growthRes.status === 'fulfilled' ? growthRes.value : []
+          const prevScore = growth.length > 1 ? growth[growth.length - 2]?.score ?? 0 : 0
+          setStats({
+            latestVideo: null,
+            overall: an.overall_score,
+            improvement: Math.max(0, an.overall_score - prevScore),
+            metrics: an.metrics || [],
+            strengths: an.strengths || [],
+            weaknesses: an.weaknesses || [],
+            recommendations: an.recommendations || [],
+            trainingPlan: an.training_plan || [],
+            badges: an.badges || [],
+            growth: growth,
+            timeline: an.timeline || [],
+            injury: an.injury || null,
+            careerPotential: an.career_potential || [],
+            comparison: an.comparison || null,
+          })
+          setProfile(prev => ({ ...prev, overallScore: an.overall_score }))
+        } else {
+          // New player has no video analysis yet — clear previous stats!
+          setStats(EMPTY_STATS)
+          setProfile(prev => ({ ...prev, overallScore: 0 }))
+        }
+      } else {
+        setStats(EMPTY_STATS)
       }
 
       // Notifications
@@ -194,6 +222,8 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
           id: n.id, category: n.category, title: n.title,
           desc: n.desc, time: n.time, icon: n.icon, read: n.read,
         })))
+      } else {
+        setNotifications([])
       }
 
       // Videos
@@ -201,11 +231,21 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
         setVideos(videosRes.value.map((v: any) => ({
           id: String(v.id), name: v.name, date: v.date, size: v.size, status: v.status === 'done' ? 'Analyzed' : 'Pending',
         })))
+      } else {
+        setVideos([])
+      }
+
+      // Real Invitations
+      if (invsRes.status === 'fulfilled' && invsRes.value) {
+        const pending = invsRes.value.filter((i) => (i.status || '').toLowerCase() === 'pending')
+        setPendingInvitations(pending)
+      } else {
+        setPendingInvitations([])
       }
     } catch (e) {
       console.warn('fetchStats error:', e)
     }
-  }, [isLoggedIn])
+  }, [])
 
   useEffect(() => {
     fetchStats()
@@ -254,6 +294,7 @@ export function AthleteProvider({ children }: { children: ReactNode }) {
       stats,
       videos,
       notifications,
+      pendingInvitations,
       unreadNotifications: notifications.filter(n => !n.read).length,
       addVideo,
       addAssessment,

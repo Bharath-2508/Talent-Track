@@ -7,8 +7,6 @@ import PlayerDashboard from './pages/player/Dashboard'
 import UploadVideo from './pages/player/Upload'
 import AiDetection from './pages/player/Detection'
 import PerformanceReport from './pages/player/Report'
-import TrainingPlan from './pages/player/Training'
-import LearningHub from './pages/player/Learn'
 import Portfolio from './pages/player/Portfolio'
 import GrowthTimeline from './pages/player/Timeline'
 import VideoComparison from './pages/player/Compare'
@@ -50,8 +48,6 @@ export default function App() {
           <Route path="/player/upload" element={<UploadVideo />} />
           <Route path="/player/analyze" element={<AiDetection />} />
           <Route path="/player/report" element={<PerformanceReport />} />
-          <Route path="/player/training" element={<TrainingPlan />} />
-          <Route path="/player/learn" element={<LearningHub />} />
           <Route path="/player/portfolio" element={<Portfolio />} />
           <Route path="/player/timeline" element={<GrowthTimeline />} />
           <Route path="/player/compare" element={<VideoComparison />} />

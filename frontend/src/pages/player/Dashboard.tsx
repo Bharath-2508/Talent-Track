@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { ArrowRight, Zap, Shield, TrendingUp, Calendar, Upload, Award } from 'lucide-react'
+import { ArrowRight, Zap, Shield, TrendingUp, Upload, Award, CheckCircle2 } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { PLAYER_NAV } from '../nav'
 import { Card, SectionHead, Progress, Pill } from '../../components/ui'
@@ -15,13 +16,30 @@ const greeting = () => {
 }
 
 export default function PlayerDashboard() {
-  const { sport, athlete, stats, notifications, unreadNotifications } = useAthlete()
+  const { sport, athlete, stats, notifications, unreadNotifications, markAllRead } = useAthlete()
   const meta = SPORT_META[sport]
   const firstName = athlete.name.split(' ')[0]
   const hasAssessment = stats.overall > 0
   const recs = stats.recommendations.slice(0, 3)
   const earnedBadges = stats.badges.filter((b) => b.earned)
-  const nextPlanFocus = stats.trainingPlan.find((d) => d.day === new Date().toLocaleDateString('en-US', { weekday: 'long' }))?.focus || stats.trainingPlan[0]?.focus || '—'
+
+  // Find unread coach shortlist or trial invitation notification for popup
+  const coachNotif = notifications.find(
+    (n) => !n.read && (n.category === 'coach' || n.category === 'invite')
+  )
+
+  const [showNotifPopup, setShowNotifPopup] = useState(false)
+
+  useEffect(() => {
+    if (coachNotif) {
+      setShowNotifPopup(true)
+    }
+  }, [coachNotif])
+
+  const handleDismissPopup = () => {
+    setShowNotifPopup(false)
+    markAllRead()
+  }
 
   const metricCards = [
     { l: 'Overall', v: stats.overall, color: 'grad' },
@@ -30,6 +48,44 @@ export default function PlayerDashboard() {
 
   return (
     <Layout nav={PLAYER_NAV} title="My Dashboard" crumb="Dashboard" portal="player" notifCount={unreadNotifications}>
+      {/* Animated Coach Shortlist / Trial Invitation Popup Modal */}
+      {showNotifPopup && coachNotif && (
+        <div className="modal-backdrop" style={{ zIndex: 9999 }}>
+          <div
+            className="modal-content text-center"
+            style={{
+              maxWidth: 480,
+              background: '#ffffff',
+              border: '2px solid #6366f1',
+              boxShadow: '0 20px 40px -10px rgba(99, 102, 241, 0.25)',
+              padding: 32,
+              borderRadius: 24,
+              color: '#0f172a',
+            }}
+          >
+            <div style={{ fontSize: 56, marginBottom: 12 }}>
+              {coachNotif.icon || '🌟'}
+            </div>
+            <div className="mb-2">
+              <Pill color="pill-purple">COACH RECRUITMENT ALERT</Pill>
+            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 10 }}>
+              {coachNotif.title}
+            </h2>
+            <p style={{ color: '#cbd5e1', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+              {coachNotif.desc}
+            </p>
+            <button
+              className="btn btn-primary btn-lg btn-block"
+              onClick={handleDismissPopup}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              <CheckCircle2 size={18} /> Acknowledge & View Opportunities
+            </button>
+          </div>
+        </div>
+      )}
+
       <Card glow className="welcome-banner mb-4">
         <div className="flex between wrap gap-3">
           <div>
@@ -44,7 +100,7 @@ export default function PlayerDashboard() {
             </div>
             <div className="mt-3" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <span className="pill pill-blue">My Sport: {meta.icon} {meta.label}</span>
-              <span className="pill pill-purple">My Level: {athlete.level || '—'}</span>
+              <span className="pill pill-purple">My Level: {athlete.level || 'State Athlete'}</span>
               <span className="pill pill-green">My AI Score: {hasAssessment ? athlete.overallScore : 'No assessment yet'}</span>
               {hasAssessment && <span className="pill pill-cyan">My Improvement: +{stats.improvement}%</span>}
             </div>
@@ -58,7 +114,7 @@ export default function PlayerDashboard() {
         </div>
       </Card>
 
-      <div className="grid grid-4 mb-4">
+      <div className="grid grid-3 mb-4">
         <Card hover pad className="stat" style={{ background: 'var(--grad-soft)', borderColor: 'var(--grad-border)' }}>
           <div className="stat-icon pulse-ring"><Zap /></div>
           <div>
@@ -84,15 +140,6 @@ export default function PlayerDashboard() {
             <div className="stat-label">My Injury Risk</div>
           </div>
           <span className="stat-sub" style={{ color: 'var(--blue)' }}>View details →</span>
-        </Link>
-
-        <Link to="/player/training" className="card card-hover card-pad stat" style={{ textDecoration: 'none' }}>
-          <div className="stat-icon"><Calendar /></div>
-          <div>
-            <div className="stat-value" style={{ fontSize: 22 }}>{stats.trainingPlan.length ? 'Week plan' : '—'}</div>
-            <div className="stat-label">My Training Plan</div>
-          </div>
-          <span className="stat-sub" style={{ color: 'var(--blue)' }}>{stats.trainingPlan.length ? `7 days · next: ${nextPlanFocus}` : 'Generated after assessment →'}</span>
         </Link>
       </div>
 
@@ -136,19 +183,17 @@ export default function PlayerDashboard() {
           <SectionHead
             title="My AI Recommendations"
             sub={`Personalized for my ${meta.label.toLowerCase()} profile`}
-            action={<Link to="/player/learn" className="link small">Learning Hub</Link>}
           />
           {recs.length ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {recs.map((r) => (
-                <Link key={r.id} to="/player/learn" className="card card-hover" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 12 }}>
+                <div key={r.id} className="card" style={{ display: 'flex', gap: 12, alignItems: 'center', padding: 12 }}>
                   <div className="stat-icon" style={{ width: 38, height: 38, flexShrink: 0 }}>{r.icon}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 600, fontSize: 13.5 }}>{r.title}</div>
                     <div className="tiny dim">{r.desc}</div>
                   </div>
-                  <ArrowRight size={15} color="var(--text-dim)" style={{ flexShrink: 0 }} />
-                </Link>
+                </div>
               ))}
             </div>
           ) : (
@@ -178,10 +223,10 @@ export default function PlayerDashboard() {
                       <stop offset="100%" stopColor="#a855f7" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} domain={[60, 100]} />
-                  <Tooltip contentStyle={{ background: '#0e1526', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, color: '#e7eef8' }} labelStyle={{ color: '#9aa8bd' }} />
+                  <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, color: '#0f172a', boxShadow: '0 10px 25px -5px rgba(15,23,42,0.1)' }} labelStyle={{ color: '#64748b' }} />
                   <Area type="monotone" dataKey="score" stroke="url(#strokeGrad)" strokeWidth={3} fill="url(#grow)" />
                 </AreaChart>
               </ResponsiveContainer>

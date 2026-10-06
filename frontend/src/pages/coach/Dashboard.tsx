@@ -151,10 +151,10 @@ export default function CoachDashboard() {
                       <stop offset="100%" stopColor="#a855f7" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="stage" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ background: '#0e1526', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} />
+                  <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 10px 25px -5px rgba(15,23,42,0.1)', color: '#0f172a' }} />
                   <Bar dataKey="value" fill="url(#cb)" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

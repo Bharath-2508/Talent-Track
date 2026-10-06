@@ -32,6 +32,7 @@ import {
 import { Avatar, cx } from './ui'
 import { useAthlete } from '../context/AthleteContext'
 import { SPORT_META } from '../data/mock'
+import { CelebrationPopupModal, RealPlayerInvitation } from './CelebrationPopupModal'
 
 export type NavItem = { to: string; label: string; icon: string; badge?: string }
 
@@ -53,11 +54,36 @@ export function Layout({
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { sport, athlete } = useAthlete()
+  const { sport, athlete, pendingInvitations, refreshStats } = useAthlete()
+  const [activePopupInv, setActivePopupInv] = useState<RealPlayerInvitation | null>(null)
 
   useEffect(() => {
     setOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    if (portal === 'player' && pendingInvitations && pendingInvitations.length > 0) {
+      const target = pendingInvitations.find((inv) => !sessionStorage.getItem(`ack_inv_${inv.id}`))
+      if (target) {
+        setActivePopupInv(target)
+      } else {
+        setActivePopupInv(null)
+      }
+    } else {
+      setActivePopupInv(null)
+    }
+  }, [portal, pendingInvitations])
+
+  const handleClosePopup = (id: number) => {
+    sessionStorage.setItem(`ack_inv_${id}`, 'true')
+    setActivePopupInv(null)
+  }
+
+  const handleRespondedPopup = async (id: number) => {
+    sessionStorage.setItem(`ack_inv_${id}`, 'true')
+    setActivePopupInv(null)
+    await refreshStats()
+  }
 
   const meta = SPORT_META[sport]
   const home = portal === 'player' ? '/player/dashboard' : '/coach/dashboard'
@@ -93,6 +119,15 @@ export function Layout({
 
   return (
     <div className="app">
+      {/* Real-time Coach Invitation Celebration Popup Modal */}
+      {portal === 'player' && activePopupInv && (
+        <CelebrationPopupModal
+          invitation={activePopupInv}
+          onResponded={handleRespondedPopup}
+          onClose={handleClosePopup}
+        />
+      )}
+
       <div className={cx('bg-orb')} />
       <aside className={cx('sidebar', open && 'open')}>
         <div className="brand">

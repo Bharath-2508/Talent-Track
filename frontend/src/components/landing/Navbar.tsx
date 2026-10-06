@@ -51,8 +51,8 @@ export default function Navbar({ activeSection }: NavbarProps) {
         right: 0,
         zIndex: 100,
         backdropFilter: 'blur(16px)',
-        background: scrolled ? 'rgba(7, 11, 20, 0.92)' : 'rgba(7, 11, 20, 0.65)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        background: scrolled ? 'rgba(255, 255, 255, 0.92)' : 'rgba(255, 255, 255, 0.75)',
+        borderBottom: '1px solid #e2e8f0',
         transition: 'all 0.3s ease',
       }}
     >

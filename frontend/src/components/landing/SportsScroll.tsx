@@ -63,7 +63,7 @@ export default function SportsScroll() {
       style={{
         position: 'relative',
         height: isMobile ? 'auto' : '120vh',
-        background: 'linear-gradient(180deg, var(--bg) 0%, #0a0f1d 50%, var(--bg) 100%)',
+        background: 'linear-gradient(180deg, var(--bg) 0%, #f1f5f9 50%, var(--bg) 100%)',
         paddingTop: isMobile ? 60 : 0,
         paddingBottom: isMobile ? 60 : 0,
       }}

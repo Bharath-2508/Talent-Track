@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MapPin, Mail, Phone, Building2, Award, Pencil } from 'lucide-react'
+import { MapPin, Mail, Phone, Building2, Award, Pencil, LogOut } from 'lucide-react'
 import { Layout } from '../../components/Layout'
 import { COACH_NAV } from '../nav'
 import { Card, SectionHead, Pill, Avatar, Progress } from '../../components/ui'
@@ -80,7 +80,10 @@ export default function CoachProfile() {
             running and sprinting. Leverages TalentTrack AI analytics to shortlist athletes based on objective AI performance
             scores rather than bias. Has helped 40+ athletes reach district and state level.
           </p>
-          <Link to="/coach/dashboard" className="btn btn-primary btn-sm mt-3">Back to Dashboard</Link>
+          <div className="flex gap-2 mt-3 wrap">
+            <Link to="/coach/dashboard" className="btn btn-primary btn-sm">Back to Dashboard</Link>
+            <Link to="/" className="btn btn-outline btn-sm"><LogOut size={14} /> Logout</Link>
+          </div>
         </Card>
       </div>
     </Layout>

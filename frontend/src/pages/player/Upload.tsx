@@ -88,6 +88,48 @@ export default function UploadVideo() {
 
   return (
     <Layout nav={PLAYER_NAV} title="Upload Running / Sprinting Video" crumb="Upload Video" portal="player" notifCount={2}>
+      {/* Animated Invalid Video Warning Popup Modal */}
+      {stage === 'error' && (
+        <div className="modal-backdrop" style={{ zIndex: 9999 }}>
+          <div
+            className="modal-content text-center"
+            style={{
+              maxWidth: 480,
+              background: '#ffffff',
+              border: '2px solid #ef4444',
+              boxShadow: '0 20px 40px -10px rgba(239, 68, 68, 0.2)',
+              padding: 32,
+              borderRadius: 24,
+              color: '#0f172a',
+            }}
+          >
+            <div style={{ fontSize: 56, marginBottom: 12 }}>⚠️</div>
+            <div className="mb-2">
+              <Pill color="pill-red">INVALID PRACTICE VIDEO</Pill>
+            </div>
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 10 }}>
+              {error?.toLowerCase().includes('model')
+                ? 'AI Model Setup Needed'
+                : error?.toLowerCase().includes('visible') || error?.toLowerCase().includes('full body')
+                ? 'Athlete Not Fully Visible'
+                : error?.toLowerCase().includes('no human')
+                ? 'No Athlete Detected'
+                : 'Running Motion Not Detected'}
+            </h2>
+            <p style={{ color: '#475569', fontSize: 14, lineHeight: 1.6, marginBottom: 24 }}>
+              {error || 'The uploaded file is not a valid player practice video. Please upload a clear video showing full-body sprint movement.'}
+            </p>
+            <button
+              className="btn btn-primary btn-lg btn-block"
+              onClick={() => { setStage('idle'); setProgress(0); setError(null) }}
+              style={{ cursor: 'pointer', background: '#ef4444', borderColor: '#dc2626' }}
+            >
+              Try Uploading Practice Video Again
+            </button>
+          </div>
+        </div>
+      )}
+
       <SectionHead
         title="Upload Running / Sprinting Video"
         sub={`Our AI will analyze your ${meta.label.toLowerCase()} performance automatically.`}
@@ -170,7 +212,7 @@ export default function UploadVideo() {
                 { n: '02', t: 'Frame extraction', d: 'OpenCV extracts frames every 3rd frame from your video.' },
                 { n: '03', t: 'Pose estimation', d: 'MediaPipe Pose computes 33 body landmarks per frame.' },
                 { n: '04', t: 'Metric scoring', d: '6 biomechanical metrics scored against benchmark ranges.' },
-                { n: '05', t: 'Personalized plan', d: 'Training plan, recommendations & badges generated from your weaknesses.' },
+                { n: '05', t: 'Personalized report', d: 'AI analysis, recommendations & badges generated from your weaknesses.' },
               ].map((s) => (
                 <div key={s.n} className="flex" style={{ gap: 14, alignItems: 'flex-start' }}>
                   <div className="step-num" style={{ width: 30, height: 30, margin: 0, flexShrink: 0, fontSize: 12 }}>{s.n}</div>

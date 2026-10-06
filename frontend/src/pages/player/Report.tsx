@@ -192,9 +192,6 @@ export default function PerformanceReport() {
                   </div>
                 ))}
               </div>
-              <Link to="/player/training" className="btn btn-primary btn-block mt-3">
-                Get Personalized Training Plan <ArrowRight size={15} />
-              </Link>
             </Card>
           </div>
 
@@ -244,7 +241,6 @@ export default function PerformanceReport() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Link to="/player/learn" className="btn btn-outline btn-sm"><LineChart size={14} /> Learning Hub</Link>
                 <Link to="/player/compare" className="btn btn-primary btn-sm">Compare My Videos <ArrowRight size={14} /></Link>
               </div>
             </div>

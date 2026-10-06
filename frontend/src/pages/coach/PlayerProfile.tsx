@@ -9,6 +9,16 @@ import { PLAYERS, SPORT_META, SPORT_METRICS, BADGES, ATHLETE, STRENGTHS, WEAKNES
 export default function PlayerProfile() {
   const { id } = useParams()
   const p = PLAYERS.find((x) => x.id === Number(id)) || PLAYERS[0]
+
+  if (!p) {
+    return (
+      <Layout nav={COACH_NAV} title="Player Profile" crumb="Find Players" portal="coach" notifCount={3}>
+        <Link to="/coach/search" className="btn btn-ghost btn-sm mb-3"><ArrowLeft size={15} /> Back to search</Link>
+        <div style={{ padding: 40, textAlign: 'center' }}>Player not found or data is empty.</div>
+      </Layout>
+    )
+  }
+
   const meta = SPORT_META[p.sport]
   const metrics = SPORT_METRICS[p.sport]
 
@@ -101,7 +111,7 @@ export default function PlayerProfile() {
                 <LineChart data={p.trend.map((v, i) => ({ m: ['Jan', 'Feb', 'Mar', 'Apr'][i], v }))}>
                   <XAxis dataKey="m" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis hide domain={[50, 100]} />
-                  <Tooltip contentStyle={{ background: '#0e1526', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} />
+                  <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 12, boxShadow: '0 10px 25px -5px rgba(15,23,42,0.1)', color: '#0f172a' }} />
                   <Line type="monotone" dataKey="v" stroke="#3d8bff" strokeWidth={3} dot={{ r: 4, fill: '#3d8bff' }} />
                 </LineChart>
               </ResponsiveContainer>

@@ -6,8 +6,6 @@ export const PLAYER_NAV: NavItem[] = [
   { to: '/player/report', label: 'My Analysis', icon: 'FileText' },
   { to: '/player/timeline', label: 'My Growth', icon: 'TrendingUp' },
   { to: '/player/compare', label: 'Video Comparison', icon: 'GitCompare' },
-  { to: '/player/training', label: 'Training Plan', icon: 'Calendar' },
-  { to: '/player/learn', label: 'Learning Hub', icon: 'GraduationCap' },
   { to: '/player/portfolio', label: 'My Portfolio', icon: 'User' },
 ]
 

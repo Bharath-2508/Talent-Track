@@ -4,6 +4,7 @@ import { Layout } from '../../components/Layout'
 import { PLAYER_NAV } from '../nav'
 import { Card, SectionHead, Pill } from '../../components/ui'
 import { useAthlete } from '../../context/AthleteContext'
+import { CoachInboxSection } from '../../components/CoachInboxSection'
 
 export default function GrowthTimeline() {
   const { stats } = useAthlete()
@@ -60,6 +61,9 @@ export default function GrowthTimeline() {
           </div>
         </Card>
       )}
+
+      {/* Coach Invitations & Direct Messages Section */}
+      <CoachInboxSection />
 
       <Card glow pad className="mt-4">
         <div className="flex between wrap gap-2">

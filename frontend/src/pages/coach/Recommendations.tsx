@@ -60,7 +60,7 @@ export default function Recommendations() {
                 <LineChart data={p.trend.map((v, idx) => ({ m: ['J','F','M','A'][idx], v }))}>
                   <XAxis dataKey="m" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis hide domain={[50, 100]} />
-                  <Tooltip contentStyle={{ background: '#0e1526', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, fontSize: 12 }} />
+                  <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 12, boxShadow: '0 8px 20px -4px rgba(15,23,42,0.1)', color: '#0f172a' }} />
                   <Line type="monotone" dataKey="v" stroke="#8b5cf6" strokeWidth={2.5} dot={{ r: 3, fill: '#8b5cf6' }} />
                 </LineChart>
               </ResponsiveContainer>

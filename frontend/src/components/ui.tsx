@@ -117,7 +117,7 @@ export function Ring({
   )
 }
 
-export function Avatar({ name, size = 52, index = 0 }: { name: string; size?: number; index?: number }) {
+export function Avatar({ name, size = 52, index = 0, style }: { name: string; size?: number; index?: number; style?: React.CSSProperties }) {
   const initials = name
     .split(' ')
     .map((n) => n[0])
@@ -127,7 +127,7 @@ export function Avatar({ name, size = 52, index = 0 }: { name: string; size?: nu
   return (
     <div
       className={cx('ath-avatar', `avatar-grad-${(index % 6) + 1}`)}
-      style={{ width: size, height: size, fontSize: size * 0.34, borderRadius: size * 0.3 }}
+      style={{ width: size, height: size, fontSize: size * 0.34, borderRadius: size * 0.3, ...style }}
     >
       {initials}
     </div>
