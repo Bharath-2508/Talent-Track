@@ -93,6 +93,12 @@ def _analyze_frame(lm_list: list) -> dict[str, float] | None:
         lw = _pt(lm_list, LM["left_wrist"])
         rw = _pt(lm_list, LM["right_wrist"])
 
+        # Validate full-body landmark visibilities (hips, knees, ankles)
+        key_lms = [ls, rs, lh, rh, lk, rk, la, ra]
+        visibilities = [getattr(pt, 'visibility', 1.0) for pt in key_lms]
+        if visibilities and (sum(visibilities) / len(visibilities)) < 0.4:
+            return None
+
         body_h = _dist(ls, la) + 1e-9
 
         # 1. Trunk lean
@@ -193,6 +199,16 @@ def analyze_video(video_path: str) -> dict[str, Any]:
 
     if len(frame_metrics) < MIN_FRAMES:
         log.warning("Only %d valid frames in %s", len(frame_metrics), video_path)
+        return _fallback_result()
+
+    # Motion variance check: Ensure actual stride/leg movement across frames
+    stride_vals = [f["stride"] for f in frame_metrics]
+    knee_vals = [f["knee_drive"] for f in frame_metrics]
+    knee_range = (max(knee_vals) - min(knee_vals)) if knee_vals else 0.0
+    stride_std = np.std(stride_vals) if stride_vals else 0.0
+
+    if knee_range < 25.0 or stride_std < 0.008:
+        log.warning("Static video / no running stride motion detected in %s (knee_range: %.1f, stride_std: %.4f)", video_path, knee_range, stride_std)
         return _fallback_result()
 
     avg: dict[str, float] = {

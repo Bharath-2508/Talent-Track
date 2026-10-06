@@ -9,10 +9,13 @@ Scoring formula:
 
 Each entry: (metric_key, poor_threshold, excellent_threshold)
 """
+from __future__ import annotations
+
+import math
 
 # Trunk lean: degrees from vertical (lower = more upright = better for sprinting)
-# Inverted: poor is >15°, excellent is <5°
-TRUNK_LEAN_RANGE = (15.0, 5.0)  # (poor, excellent) — inverted
+# Inverted: poor is >25°, excellent is <5°
+TRUNK_LEAN_RANGE = (25.0, 5.0)  # (poor, excellent) — inverted
 
 # Knee drive angle: peak knee angle at highest lift (degrees). Higher = better knee drive.
 KNEE_DRIVE_RANGE = (50.0, 110.0)  # (poor, excellent)
@@ -31,14 +34,26 @@ STRIDE_RANGE = (0.30, 0.80)     # (poor, excellent)
 ALIGNMENT_RANGE = (0.50, 0.92)  # (poor, excellent)
 
 
-def score_metric(value: float, poor: float, excellent: float, inverted: bool = False) -> int:
-    """Return 0–100 score for a metric value given its range."""
-    if inverted:
-        value = poor + excellent - value  # flip
-        poor, excellent = excellent, poor + excellent - excellent
+def score_metric(value: float | None, poor: float, excellent: float, inverted: bool = False) -> int:
+    """Return 0–100 score for a metric value given its range safely."""
+    if value is None:
+        return 0
+
+    try:
+        val = float(value)
+    except (TypeError, ValueError):
+        return 0
+
+    if math.isnan(val) or math.isinf(val):
+        return 0
 
     span = excellent - poor
     if span == 0:
         return 50
-    raw = (value - poor) / span * 100
+
+    if inverted and poor < excellent:
+        raw = (excellent - val) / span * 100
+    else:
+        raw = (val - poor) / span * 100
+
     return int(max(0, min(100, round(raw))))

@@ -4,6 +4,7 @@ All configuration is read from environment variables / `.env` via
 pydantic-settings. No secrets are hardcoded anywhere in the codebase.
 """
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -24,7 +25,8 @@ class Settings(BaseSettings):
     # --- Database ---
     # Local default is SQLite so the project runs out of the box.
     # Production uses PostgreSQL (Neon): postgresql+psycopg2://...
-    DATABASE_URL: str = "sqlite:///./sportsverse.db"
+    DATABASE_URL: str = f"sqlite:///{(Path(__file__).resolve().parent.parent / 'sportsverse.db').as_posix()}"
+
 
     # --- Auth (used from PHASE 2) ---
     JWT_SECRET: str = "change-me"

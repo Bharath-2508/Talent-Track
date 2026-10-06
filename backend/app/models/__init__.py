@@ -6,7 +6,7 @@ from .profile import AthleteProfile, CoachProfile
 from .video import Video
 from .analysis import Analysis
 from .trial import Trial, TrialApplication
-from .recruitment import Shortlist, Invitation
+from .recruitment import Shortlist, Invitation, AthleteInvitationResponse
 from .notification import Notification
 
 __all__ = [
@@ -24,5 +24,6 @@ __all__ = [
     "TrialApplication",
     "Shortlist",
     "Invitation",
+    "AthleteInvitationResponse",
     "Notification",
 ]

@@ -120,6 +120,9 @@ def compute_comparison(current_scores: dict, previous_analysis: Analysis | None)
     }
 
 
+from ..ai.video_validator import validate_running_video
+
+
 def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
     """Background task — run AI analysis on temporary video file, save report, compare with previous, and delete temp file."""
     db: Session = SessionLocal()
@@ -129,10 +132,9 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
         if not video:
             return
 
-        video.status = "processing"
-        db.commit()
-
         temp_video_path = video.file_path
+
+        log.info("[PIPELINE] ML inference started")
 
         # Query PREVIOUS analysis for SAME athlete BEFORE creating new report
         previous_analysis = (
@@ -156,23 +158,31 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
         if not temp_video_path or not os.path.exists(temp_video_path):
             raise Exception(f"Temporary video file not found at {temp_video_path}")
 
+        # Ensure ML models are loaded
+        if not hasattr(pipeline, 'reference_features'):
+            pipeline.load_models()
+
         # Run actual ML InferencePipeline on uploaded temporary video
         result = pipeline.analyze_video(temp_video_path)
         if "error" in result:
-            raise Exception(result["error"])
+            raise ValueError(result["error"])
 
         def _norm(data):
-            if not data or data.get("max_score", 1) == 0: return 0
-            return int((data["score"] / data["max_score"]) * 100)
+            if not data or not isinstance(data, dict) or data.get("max_score", 1) == 0: return 0
+            return int((data.get("score", 0) / data["max_score"]) * 100)
 
-        def _map_weakness(w_str):
-            w_str = w_str.lower()
+        def _map_weakness(w_obj):
+            if isinstance(w_obj, dict):
+                w_str = str(w_obj.get("name", "")).lower()
+            else:
+                w_str = str(w_obj).lower()
+
             if "posture" in w_str: return "Posture"
-            if "arm movement" in w_str: return "Arm Movement"
-            if "leg movement" in w_str: return "Leg / Knee Movement"
-            if "body alignment" in w_str: return "Body Alignment"
-            if "running technique" in w_str: return "Running Technique"
-            if "symmetry" in w_str: return "Movement Symmetry"
+            if "arm" in w_str: return "Arm Movement"
+            if "leg" in w_str or "knee" in w_str: return "Leg / Knee Movement"
+            if "align" in w_str: return "Body Alignment"
+            if "tech" in w_str: return "Running Technique"
+            if "symm" in w_str: return "Movement Symmetry"
             return "Running Technique"
 
         posture_val = _norm(result.get("posture"))
@@ -181,8 +191,14 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
         align_val = _norm(result.get("body_alignment"))
         tech_val = _norm(result.get("running_technique"))
         sym_val = _norm(result.get("symmetry"))
-        overall_val = result.get("overall_score", 0)
+        overall_val = int(result.get("overall_score", 0))
         mov_sim = float(result.get("movement_similarity", 0.0))
+        detection_rate = float(result.get("pose_detection_rate", 100.0))
+
+        if overall_val == 0 or "note" in result or detection_rate < 15.0:
+            raise ValueError(
+                result.get("note") or f"Invalid practice video: Low pose detection rate ({detection_rate:.1f}%). Human running motion could not be detected. Please upload a clear sprint practice video showing full-body movement in good lighting."
+            )
 
         raw = {
             "overall_score": overall_val,
@@ -194,8 +210,8 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
                 {"label": "Running Technique", "value": tech_val},
                 {"label": "Movement Symmetry", "value": sym_val},
             ],
-            "strengths": result.get("strengths", []),
-            "weaknesses": [{"name": _map_weakness(w), "impact": "High impact"} for w in result.get("weaknesses", [])],
+            "strengths": [str(s) for s in result.get("strengths", [])],
+            "weaknesses": [{"name": _map_weakness(str(w)), "impact": "High impact"} for w in result.get("weaknesses", [])],
         }
 
         current_scores_dict = {
@@ -212,8 +228,8 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
         report = build_report(raw, previous_scores, athlete_name=name)
 
         analysis_meta = {
-            "pose_detection_rate": result.get("pose_detection_rate", 100.0),
-            "video_filename": video.original_filename,
+            "pose_detection_rate": float(result.get("pose_detection_rate", 100.0)),
+            "video_filename": str(video.original_filename),
             "movement_similarity": mov_sim,
         }
 
@@ -246,6 +262,7 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
 
         video.status = "done"
         video.file_path = "[deleted after analysis]"
+        video.stored_filename = "[deleted]"
 
         # Create notification for player
         notif = Notification(
@@ -263,19 +280,22 @@ def _run_analysis(video_id: int, athlete_id: int, user_id: int) -> None:
     except Exception as exc:
         log.exception("Analysis failed for video %d: %s", video_id, exc)
         try:
+            db.rollback()
             video = db.query(Video).filter(Video.id == video_id).first()
             if video:
                 video.status = "error"
                 video.error_message = str(exc)
+                video.file_path = "[deleted after analysis failure]"
+                video.stored_filename = "[deleted]"
                 db.commit()
-        except Exception:
-            pass
+        except Exception as rollback_err:
+            log.error("Failed to set video status to error: %s", rollback_err)
     finally:
-        # DELETE temporary video file after analysis is completed (or failed)
+        # ABSOLUTE PRIVACY GUARANTEE: Delete uploaded video file from disk immediately
         if temp_video_path and os.path.exists(temp_video_path):
             try:
                 os.remove(temp_video_path)
-                log.info("Deleted temporary video file: %s", temp_video_path)
+                log.info("Permanently deleted uploaded video file from disk: %s", temp_video_path)
             except Exception as del_err:
                 log.warning("Failed to delete temp video %s: %s", temp_video_path, del_err)
         db.close()
@@ -297,6 +317,29 @@ def trigger_analysis(
         return {"message": "Analysis already in progress.", "status": "processing"}
     if video.status == "done":
         return {"message": "Analysis already complete.", "status": "done"}
+
+    # SYNCHRONOUS PRE-PIPELINE VALIDATION
+    validation_result = validate_running_video(video.file_path)
+
+    if not validation_result.is_valid:
+        temp_path = video.file_path
+        video.status = "error"
+        video.error_message = validation_result.rejection_reason
+        video.file_path = "[deleted after validation failure]"
+        video.stored_filename = "[deleted]"
+        db.commit()
+
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+                log.info("Deleted temporary invalid video file: %s", temp_path)
+            except Exception as del_err:
+                log.warning("Failed to delete temp invalid video %s: %s", temp_path, del_err)
+
+        raise HTTPException(
+            status_code=422,
+            detail=validation_result.rejection_reason
+        )
 
     video.status = "processing"
     db.commit()
