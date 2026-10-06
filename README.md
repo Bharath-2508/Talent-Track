@@ -84,6 +84,50 @@ talenttrack/
 - Python 3.11+
 - PostgreSQL (optional for local dev — SQLite is the default)
 
+---
+
+## 💻 How to Run in VS Code (Visual Studio Code)
+
+Follow these simple steps to run both the Backend and Frontend servers in VS Code:
+
+### Option 1: Using VS Code Integrated Terminals (Recommended)
+
+1. **Open VS Code** in the project root directory (`TalentTrack-AI`).
+
+2. **Start Backend Server (Terminal 1)**:
+   - Open a terminal in VS Code: `Ctrl + ~` (or **Terminal** → **New Terminal**).
+   - Run the following commands:
+     ```bash
+     cd backend
+     ..\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+     ```
+   - *Backend server runs live at:* `http://127.0.0.1:8000` (Swagger API Docs at `http://127.0.0.1:8000/docs`).
+
+3. **Start Frontend Server (Terminal 2)**:
+   - Click the `+` button in the VS Code terminal panel to open a **Second Terminal**.
+   - Run the following commands:
+     ```bash
+     cd frontend
+     npm run dev
+     ```
+   - *Frontend web app runs live at:* `http://localhost:5173` (or `http://localhost:3000`).
+
+4. **Open Application in Browser**:
+   - Navigate to `http://localhost:5173` in your web browser.
+
+---
+
+### Option 2: Using VS Code Tasks
+
+1. Press `Ctrl + Shift + P` in VS Code to open the Command Palette.
+2. Type `Tasks: Run Task` and press `Enter`.
+3. Select **Start Backend (FastAPI)**.
+4. Press `Ctrl + Shift + P` again, select `Tasks: Run Task`, and choose **Start Frontend (Vite)**.
+
+---
+
+### Manual Setup Steps
+
 ### 1. Frontend
 
 ```bash
@@ -104,7 +148,7 @@ pip install -r requirements.txt
 
 cp .env.example .env            # then edit DATABASE_URL / secrets
 python scripts/init_db.py       # create tables + seed roles & 53 sports
-uvicorn app.main:app --reload   # http://localhost:8000 (docs at /docs)
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload   # http://127.0.0.1:8000
 ```
 
 The backend runs out of the box on SQLite. To use PostgreSQL, set
